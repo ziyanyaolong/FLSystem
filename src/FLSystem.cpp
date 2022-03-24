@@ -66,7 +66,7 @@ void FLSYSTEM::FLSystem::loop()
 	lv_task_handler();
 
 #ifdef FLSYSTEM_ENABLE_LVGL_TICK_SYNCH
-	lv_task_handler(taskConfig.runTimeDelay);
+	lv_tick_inc(taskConfig.runTimeDelay);
 
 #endif
 
