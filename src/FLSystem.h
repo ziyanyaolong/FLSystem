@@ -1,7 +1,7 @@
 #ifndef FLSYSTEM_FLSYSTEM_MAIN_H
 #define FLSYSTEM_FLSYSTEM_MAIN_H
 
-#include "FLSystemConfig.h"
+#include "PlatformInterface/PlatformInterface.h"
 #include "Driver/ExternalStorage/ExternalStorage.h"
 #include "System/BaseDataTable/BaseDataTable.h"
 #include "Driver/Display/Display.h"
@@ -16,6 +16,7 @@ namespace FLSYSTEM
 		Kernel kernel;
 		bool isRun = false;
 		FLQueue<ProcessScheduleAPI*> processList;
+		TransplantationInterface* transplantation = nullptr;
 
 	protected:
 		virtual void loop() override;
@@ -26,6 +27,7 @@ namespace FLSYSTEM
 		virtual ~FLSystem();
 		FLSystem();
 
+		void setTransplantation() {}
 		void start();
 		void registerProcess(ProcessScheduleAPI* api);
 		void (*initInOther)(FLSystem* flSystem) = nullptr;

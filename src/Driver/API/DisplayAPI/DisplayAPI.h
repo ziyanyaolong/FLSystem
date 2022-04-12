@@ -75,7 +75,6 @@ namespace FLSYSTEM
             auto display = static_cast<DisplayAPI *>(disp_drv->user_data);
             if (display == nullptr)
             {
-                FLTaskDelay(1);
                 return;
             }
 

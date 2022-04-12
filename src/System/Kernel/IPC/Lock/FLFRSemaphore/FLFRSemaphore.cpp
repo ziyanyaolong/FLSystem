@@ -30,7 +30,8 @@ FLSYSTEM::FLFRSemaphore::FLFRSemaphore(FLFRSemaphore::Type type, UBaseType_t uxM
 
 	if (semaphore == nullptr)
 	{
-		FLException("create semaphore error!");
+		FLSYSTEM_TRANSPLANTATION_INSTANCE->exception("create semaphore error!");
+		return;
 	}
 }
 

@@ -19,7 +19,7 @@ namespace FLSYSTEM
 		};
 
 	protected:
-		ProcessScheduleAPI(FLObject *object = nullptr, const std::string &name = std::string("")) : ThreadAPI(object, name) {}
+		ProcessScheduleAPI(FLObject* object = nullptr, const std::string& name = std::string("")) : ThreadAPI(object, name) {}
 		ProcessScheduleAPI(const std::string &name) : ThreadAPI(name) {}
 		ProcessConfig processConfig;
 
@@ -35,9 +35,9 @@ namespace FLSYSTEM
 			{
 				loop();
 				process();
-				FLTaskDelay(taskConfig.runTimeDelay);
+				FLSYSTEM_TRANSPLANTATION_INSTANCE->taskDelay(taskConfig.runTimeDelay);
 			}
-			FLExitTask(nullptr);
+			FLSYSTEM_TRANSPLANTATION_INSTANCE->exitTask(nullptr);
 		}
 
 		virtual void begin() = 0;

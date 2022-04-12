@@ -14,6 +14,7 @@
 FLSYSTEM::FLSystem::FLSystem() : ProcessScheduleAPI()
 {
 	taskConfig.runTimeDelay = 5;
+	taskConfig.stackDepth = 4096;
 }
 
 FLSYSTEM::FLSystem::~FLSystem()
@@ -66,7 +67,7 @@ void FLSYSTEM::FLSystem::loop()
 	lv_task_handler();
 
 #ifdef FLSYSTEM_ENABLE_LVGL_TICK_SYNCH
-	lv_task_handler(taskConfig.runTimeDelay);
+	lv_tick_inc(taskConfig.runTimeDelay);
 
 #endif
 
@@ -86,10 +87,7 @@ void FLSYSTEM::FLSystem::start()
 #if (FLSYSTEM_ENABLE_THREADLIB == 0)
 
 #ifndef FLSYSTEM_ENABLE_MAIN_THREAD
-	while (1)
-	{
-		FLTaskDelay(1000);
-	}
+	FLSYSTEM_TRANSPLANTATION_INSTANCE->taskDelay(0);
 
 #endif
 	
@@ -101,7 +99,7 @@ void FLSYSTEM::FLSystem::start()
 #else
 
 #ifndef FLSYSTEM_ENABLE_MAIN_THREAD
-	FLExitTask(nullptr);
+	FLSYSTEM_TRANSPLANTATION_INSTANCE->exitTask(nullptr);
 
 #endif
 

@@ -18,82 +18,86 @@ int FLSYSTEM::ProcessSchedule::createThread(ThreadAPI *thread)
 {
     if (thread == nullptr)
     {
-        FLException("ERROR In CreateThread:fun pointer or config pointer is empty!");
+        FLSYSTEM_TRANSPLANTATION_INSTANCE->exception("ERROR In CreateThread:fun pointer or config pointer is empty!");
         return -1;
     }
     createThreadLock.lock();
 
-    thread->taskConfig.xReturned = FLNewThread(
-        &FLSYSTEM::ProcessSchedule::_runMiddle_T,
-        (std::string("FLSYSTEM.Thread.") + thread->readName()).c_str(),
-        thread->taskConfig.stack,
-        thread,
-        thread->taskConfig.priority,
-        thread->taskConfig.pvCreatedTask,
-        thread->taskConfig.core);
+    thread->getTaskConfig().taskCode = &FLSYSTEM::ProcessSchedule::_runMiddle_T;
+    thread->getTaskConfig().threadClass = (void*)thread;
+    thread->taskConfig.returned = FLSYSTEM_TRANSPLANTATION_INSTANCE->createTask(static_cast<void*>(thread->getTaskConfigPointer()));
 
     processPool.addThread(thread);
 
     createThreadLock.unlock();
 
-    return thread->taskConfig.xReturned;
+    return thread->taskConfig.returned;
 }
 
 int FLSYSTEM::ProcessSchedule::createProcess(ProcessScheduleAPI *process)
 {
     if (process == nullptr)
     {
-        FLException("ERROR In CreateThread:fun pointer or config pointer is empty!");
+        FLSYSTEM_TRANSPLANTATION_INSTANCE->exception("ERROR In CreateThread:fun pointer or config pointer is empty!");
         return -1;
     }
 
     createThreadLock.lock();
 
-    process->taskConfig.xReturned = FLNewThread(
-        &FLSYSTEM::ProcessSchedule::_runMiddle_P,
-        (std::string("FLSYSTEM.Process.") + process->readName()).c_str(),
-        process->taskConfig.stack,
-        process,
-        process->taskConfig.priority,
-        process->taskConfig.pvCreatedTask,
-        process->taskConfig.core);
+	process->getTaskConfig().taskCode = &FLSYSTEM::ProcessSchedule::_runMiddle_P;
+    process->getTaskConfig().threadClass = (void*)process;
+    process->taskConfig.returned = FLSYSTEM_TRANSPLANTATION_INSTANCE->createTask(process->getTaskConfigPointer());
 
     processPool.addProcess(process);
 
     createThreadLock.unlock();
 
-    return process->taskConfig.xReturned;
+    return process->taskConfig.returned;
 }
 
-void FLSYSTEM::ProcessSchedule::_runMiddle_P(void *process)
+void FLSYSTEM::ProcessSchedule::_runMiddle_P(void * taskConfig)
 {
-    auto _process_ = static_cast<ProcessScheduleAPI *>(process);
+    auto taskConfigPoiner = static_cast<FLSYSTEM_TRANSPLANTATION_TYPE::TaskConfig*>(taskConfig);
 
-    if (_process_ == nullptr)
+    if (taskConfigPoiner == nullptr)
     {
-        FLException("ERROR:process pointer is empty!");
+        FLSYSTEM_TRANSPLANTATION_INSTANCE->exception("ERROR:process config pointer is empty!");
         return;
     }
 
-    _process_->run();
-    _process_->exit_out();
-    FLSYSTEM::ProcessSchedule::processPool.deleteProcess(_process_);
-    FLExitTask(nullptr);
-}
-void FLSYSTEM::ProcessSchedule::_runMiddle_T(void *thread)
-{
-    auto _thread_ = static_cast<ThreadAPI *>(thread);
+    auto processPointer = static_cast<ProcessScheduleAPI*>(taskConfigPoiner->threadClass);
 
-    if (_thread_ == nullptr)
+    if (processPointer == nullptr)
     {
-        FLException("ERROR:thread pointer is empty!");
+        FLSYSTEM_TRANSPLANTATION_INSTANCE->exception("ERROR:process pointer is empty!");
         return;
     }
+    processPointer->run();
+    processPointer->exit_out();
+    FLSYSTEM::ProcessSchedule::processPool.deleteProcess(processPointer);
+    FLSYSTEM_TRANSPLANTATION_INSTANCE->exitTask(nullptr);
+}
+void FLSYSTEM::ProcessSchedule::_runMiddle_T(void *taskConfig)
+{
+	auto taskConfigPoiner = static_cast<FLSYSTEM_TRANSPLANTATION_TYPE::TaskConfig*>(taskConfig);
 
-    _thread_->run();
-    _thread_->exit_out();
-    FLSYSTEM::ProcessSchedule::processPool.deleteThread(_thread_);
-    FLExitTask(nullptr);
+	if (taskConfigPoiner == nullptr)
+	{
+		FLSYSTEM_TRANSPLANTATION_INSTANCE->exception("ERROR:thread config pointer is empty!");
+		return;
+	}
+
+	auto threadPointer = static_cast<ThreadAPI*>(taskConfigPoiner->threadClass);
+
+	if (threadPointer == nullptr)
+	{
+		FLSYSTEM_TRANSPLANTATION_INSTANCE->exception("ERROR:thread pointer is empty!");
+		return;
+	}
+    threadPointer->run();
+    threadPointer->exit_out();
+	FLSYSTEM::ProcessSchedule::processPool.deleteThread(threadPointer);
+	FLSYSTEM_TRANSPLANTATION_INSTANCE->exitTask(nullptr);
 }
 
 void FLSYSTEM::ProcessSchedule::run()

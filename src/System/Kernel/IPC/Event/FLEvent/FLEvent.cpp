@@ -1,6 +1,6 @@
 #include "FLEvent.h"
 
-FLSYSTEM::FLEventSizeType FLSYSTEM::FLEvent::_userType = static_cast<FLSYSTEM::FLEventSizeType>(Type::EndEvent);
+FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType FLSYSTEM::FLEvent::_userType = static_cast<FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType>(Type::EndEvent);
 
 FLSYSTEM::FLEvent::FLEvent()
 {

@@ -6,6 +6,10 @@
 #include "../../../SafeSTL/FLMap/FLMap.h"
 #include "../../../SafeSTL/FLVector/FLVector.h"
 
+#define FLSYSTEM_3RD_ALGORITHM
+
+#include "../../../../PlatformInterface/3rdInclude.h"
+
 namespace FLSYSTEM
 {
 	class ProcessPool

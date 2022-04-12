@@ -21,32 +21,22 @@ namespace FLSYSTEM
 			Ready
 		};
 
-		struct TaskConfig
-		{
-			uint32_t runTimeDelay = 1;
-			FLTaskPriorityType priority = 3;
-			FLTaskStackDepthType stack = 1024;
-			FLTaskCoreID core = 0;
-			FLTaskReturnedType xReturned = 0;
-			FLTaskHandleType* pvCreatedTask = nullptr;
-			FLUserDataType userData = nullptr;
-		};
-
 	protected:
-		TaskConfig taskConfig;
+		FLSYSTEM_TRANSPLANTATION_TYPE::TaskConfig taskConfig;
 		virtual void run() = 0;
 		virtual void exit_out() {}
 		virtual void process() override
 		{
-			FLEventCore.process(static_cast<EventAPI*>(this));
+			EventCore::process(static_cast<EventAPI*>(this));
 		}
 
 	public:
-		explicit ThreadAPI(FLObject* object = nullptr, const std::string &name = std::string("")) : EventAPI(object, name) { isThread = true; }
+		explicit ThreadAPI(FLObject* object = nullptr, const std::string& name = std::string("")) : EventAPI(object, name) { isThread = true; }
 		ThreadAPI(const std::string &name) : EventAPI(name) { isThread = true; }
 		virtual ~ThreadAPI() {}
 
-		TaskConfig& getTaskConfig() { return taskConfig; }
+		FLSYSTEM_TRANSPLANTATION_TYPE::TaskConfig& getTaskConfig() { return taskConfig; }
+		FLSYSTEM_TRANSPLANTATION_TYPE::TaskConfig* getTaskConfigPointer() { return &taskConfig; }
 	};
 }
 

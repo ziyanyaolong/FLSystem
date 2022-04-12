@@ -2,13 +2,16 @@
 #include <stdint.h>
 #endif
 
-
 #ifdef FLSYSTEM_3RD_STRING
 #include<string>
 #endif
 
 #ifdef FLSYSTEM_3RD_THREAD
 #include <thread>
+#endif
+
+#ifdef FLSYSTEM_3RD_ALGORITHM
+#include <algorithm>
 #endif
 
 #ifdef FLSYSTEM_3RD_VECTOR

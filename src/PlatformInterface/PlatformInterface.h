@@ -15,16 +15,14 @@
 #define FLSYSTEM_3RD_THREAD
 #elif (FLSYSTEM_ENABLE_THREADLIB == 1)
 #define FLSYSTEM_3RD_FREERTOS
+#elif (FLSYSTEM_ENABLE_THREADLIB == 2)
+#define FLSYSTEM_CUSTOM_THREAD
 #else
 #error "No Thread Lib Include!"
 #endif
 
 #ifdef FLSYSTEM_ENABLE_LVGL_8
 #define FLSYSTEM_3RD_LVGL
-#endif
-
-#if (!defined(FLSYSTEM_ENABLE_TFT_ESPI) && !defined(FLSYSTEM_ENABLE_U8G2))
-#define FLSYSTEM_ENABLE_CUSTOM_DISPLAY
 #endif
 
 #ifdef FLSYSTEM_ENABLE_DEVELOPMENT_BOARD_INSPECTION_AUTO
@@ -46,15 +44,25 @@
 
 #include "3rdInclude.h"
 
+#include "TransplantationInterface/TransplantationInterface.h"
+
+#if (FLSYSTEM_ENABLE_THREADLIB == 0)
+#include "Transplantation/StandardLibrary/StandardLibrary.h"
+#define FLSYSTEM_TRANSPLANTATION_TYPE FLSYSTEM::StandardLibrary
+#elif (FLSYSTEM_ENABLE_THREADLIB == 1)
+#include "Transplantation/FreeRTOSLibrary/FreeRTOSLibrary.h"
+#define FLSYSTEM_TRANSPLANTATION_TYPE FLSYSTEM::FreeRTOSLibrary
+#elif (FLSYSTEM_ENABLE_THREADLIB == 2)
+#define FLSYSTEM_CUSTOM_THREAD
+#endif
+
+#define FLSYSTEM_TRANSPLANTATION_INSTANCE (FLSYSTEM_TRANSPLANTATION_TYPE::instance<FLSYSTEM_TRANSPLANTATION_TYPE>())
+
 #ifndef FLSYSTEM_ESPRESSIF_BOARD
 #define FLSYSTEM_TASK_START_SCHEDULER
 #endif
 
 #ifdef FLSYSTEM_3RD_THREAD
-
-#if !_HAS_CXX20
-#error("You must use C++20 or above")
-#endif
 
 #ifndef FLSYSTEM_UNKNOW_BOARD
 #error You may not use this thread library in microcontrollers
@@ -63,24 +71,6 @@
 #endif
 
 #include "FLSystemTypeConfig.h"
-
-namespace FLSYSTEM
-{
-	FLTaskReturnedType FLNewThread(
-		FLTaskFunctionType pxTaskCode,
-		FLTaskNameType pcName,
-		FLTaskStackDepthType usStackDepth,
-		FLTaskParametersType pvParameters,
-		FLTaskPriorityType uxPriority,
-		FLTaskHandleType* pxCreatedTask,
-		FLTaskCoreID xCoreID);
-
-	void FLExitTask(FLTaskHandleType data = nullptr);
-
-	void FLTaskDelay(long long time);
-
-	void FLException(const char* data);
-}
 
 #endif
 
