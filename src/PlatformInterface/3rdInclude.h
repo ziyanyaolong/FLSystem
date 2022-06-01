@@ -2,6 +2,10 @@
 #include <stdint.h>
 #endif
 
+#ifdef FLSYSTEM_3RD_IOSTREAM
+#include <iostream>
+#endif
+
 #ifdef FLSYSTEM_3RD_STRING
 #include<string>
 #endif
@@ -30,6 +34,18 @@
 #include <map>
 #endif
 
+#ifdef FLSYSTEM_3RD_STDIO
+#include <stdio.h>
+#endif
+
+#ifdef FLSYSTEM_3RD_MUTEX
+#include <mutex>
+#endif
+
+#ifdef FLSYSTEM_3RD_CONDITION_VARIABLE
+#include <condition_variable>
+#endif
+
 #ifdef FLSYSTEM_3RD_ATOMIC
 
 #ifndef FLSYSTEM_ARDUINO_BOARD
@@ -42,14 +58,6 @@
 
 #ifdef FLSYSTEM_3RD_ARDUINO
 #include <Arduino.h>
-#endif
-
-#ifdef FLSYSTEM_3RD_LVGL
-#if _MSC_VER > 0
-#include <lvgl/lvgl.h>
-#else
-#include <lvgl.h>
-#endif
 #endif
 
 #ifdef FLSYSTEM_3RD_FREERTOS

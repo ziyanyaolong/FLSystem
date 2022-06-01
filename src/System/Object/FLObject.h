@@ -26,18 +26,32 @@ namespace FLSYSTEM
     public:
         FLObject(FLObject *parent = nullptr, const std::string &name = std::string(""));
         FLObject(const std::string &name) : BaseAPI(name), FLRTTI(){}
-        FLObject *getParent() { return _parent; }
-        void setParent(FLObject *parent) { _parent = parent; }
-        virtual ~FLObject();
+		virtual ~FLObject();
+
+        inline FLObject *getParent() { return _parent; }
+        inline void setParent(FLObject *parent) { _parent = parent; }
         
-        void installEventFilter(FLObject *object)
+        inline void installEventFilter(FLObject *object)
         {
             if (object->eventFilters == nullptr)
                 object->eventFilters = new FLObjectList();
 
             object->eventFilters->push_back(this);
         }
-        void deleteLater();
+
+		inline bool isInstallEventFilter()
+		{
+            if (eventFilters == nullptr)
+            {
+                return false;
+            }
+            else
+            {
+				return true;
+            }
+		}
+
+        inline void deleteLater();
     };
 }
 

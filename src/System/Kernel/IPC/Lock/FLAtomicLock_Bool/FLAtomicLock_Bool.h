@@ -2,24 +2,46 @@
 #define FLSYSTEM_FLATOMICLOCK_BOOL_H
 
 #include "../FLAtomicLock/FLAtomicLock.h"
-#include "../Interface/LockInterface.h"
+#include "../LockInterface/FLLockInterface.h"
 
 #ifndef FLSYSTEM_ARDUINO_BOARD
 
 namespace FLSYSTEM
 {
-    class FLAtomicLock_Bool : public LockInterface, public FLAtomicLock<bool>
+	class FLAtomicLock_Bool : public FLAtomicLock<bool>, public FLLockInterface
 	{
+	private:
+		inline virtual bool lock_FLLock() override
+		{
+			return this->lock();
+		}
+
+		inline virtual void unlock_FLLock() override
+		{
+			this->unlock();
+		}
+
+		inline virtual bool isLocking_FLLock() override
+		{
+			return this->get();
+		}
+
 	public:
-		FLAtomicLock_Bool() : LockInterface(), FLAtomicLock<bool>(false) {}
+		FLAtomicLock_Bool() : FLAtomicLock<bool>(false), FLLockInterface() {}
 		virtual ~FLAtomicLock_Bool() {}
+
 		enum class LockWay
 		{
 			Wait,
 			Direct
 		};
 
-		bool lock(LockWay way, std::size_t number = 0)
+		inline virtual FLLockType typeGet() override
+		{
+			return typeGet();
+		}
+
+		bool lock(LockWay way = LockWay::Wait, unsigned long long number = UINT64_MAX)
 		{
 			switch (way)
 			{
@@ -39,7 +61,7 @@ namespace FLSYSTEM
 			return false;
 		}
 
-		bool unlock(LockWay way, std::size_t number = 0)
+		bool unlock(LockWay way = LockWay::Direct, unsigned long long number = UINT64_MAX)
 		{
 			switch (way)
 			{
@@ -58,23 +80,9 @@ namespace FLSYSTEM
 			}
 			return false;
 		}
-
-		virtual void lock()
-		{
-			lock(LockWay::Wait);
-		}
-
-		virtual void unlock()
-		{
-			unlock(LockWay::Direct);
-		}
-
-		virtual bool isLocking()
-		{
-			return get();
-		}
 	};
 }
+
 #endif
 
 #endif

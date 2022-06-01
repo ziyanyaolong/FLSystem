@@ -16,7 +16,7 @@ FLSYSTEM::EventCore::~EventCore()
 
 void FLSYSTEM::EventCore::process(EventAPI* eventAPI)
 {
-	auto eventTable = condense(eventAPI, 16);
+	auto* eventTable = condense(eventAPI, 16);
 
 	if (eventTable == nullptr)
 		return;
@@ -24,6 +24,7 @@ void FLSYSTEM::EventCore::process(EventAPI* eventAPI)
 	notify(eventTable->object, eventTable->event);
 	delete eventTable->event;
 	delete eventTable;
+	eventTable = nullptr;
 }
 
 bool FLSYSTEM::EventCore::sendEvent(FLObject *receiver, FLEvent *event)
@@ -45,24 +46,30 @@ bool FLSYSTEM::EventCore::postEvent(FLObject *receiver, FLEvent *event)
 	{
 		if (parent == nullptr)
 		{
-			break;
+			return false;
 		}
 		else if (parent->isThread)
 		{
 			EventTable *et = new EventTable();
 			et->object = receiver;
 			et->event = event;
-			(static_cast<EventCore*>(parent))->eventQueue.push_back(et);
-			break;
+			return (static_cast<EventCore*>(parent))->eventQueue.push_back(et);
 		}
 
 		parent = parent->getParent();
 	}
+
+	return false;
 }
 
 bool FLSYSTEM::EventCore::notify(FLObject *object, FLEvent *event)
 {
-	if (object->eventFilters != nullptr)
+	if (object == nullptr || event == nullptr)
+	{
+		return false;
+	}
+
+	if (object->isInstallEventFilter())
 	{
 		bool isFilterSuccessfully = false;
 		object->eventFilters->lock();
@@ -106,7 +113,7 @@ FLSYSTEM::EventCore::EventTable* FLSYSTEM::EventCore::condense(EventAPI* eventAP
 	{
 		return nullptr;
 	}
-
+	
 	EventTable* eventTable = nullptr;
 	bool isCompare = true;
 
@@ -125,11 +132,12 @@ FLSYSTEM::EventCore::EventTable* FLSYSTEM::EventCore::condense(EventAPI* eventAP
 			continue;
 		}
 
-		if (eventTable->object == nullptr)
+		if (eventTable->object == nullptr || eventTable->event == nullptr)
 		{
 			if (eventTable->event != nullptr)
 			{
 				delete eventTable->event;
+				eventTable->event = nullptr;
 			}
 
 			delete eventTable;
@@ -141,6 +149,11 @@ FLSYSTEM::EventCore::EventTable* FLSYSTEM::EventCore::condense(EventAPI* eventAP
 				break;
 			}
 			continue;
+		}
+
+		if (!eventTable->event->isCondense())
+		{
+			return eventTable;
 		}
 
 		break;

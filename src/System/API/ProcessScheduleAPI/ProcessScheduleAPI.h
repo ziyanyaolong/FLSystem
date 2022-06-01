@@ -10,6 +10,7 @@ namespace FLSYSTEM
 	public:
 		friend class ProcessSchedule;
 		friend class ProcessPool;
+		friend class FLSystem;
 
 		struct ProcessConfig
 		{
@@ -23,6 +24,9 @@ namespace FLSYSTEM
 		ProcessScheduleAPI(const std::string &name) : ThreadAPI(name) {}
 		ProcessConfig processConfig;
 
+		virtual void begin() = 0;
+		virtual void loop() {}
+
 		virtual void run() override
 		{
 			if (!processConfig.isBegin)
@@ -31,17 +35,13 @@ namespace FLSYSTEM
 				begin();
 			}
 
-			for (;;)
+			while (!this->isExit())
 			{
 				loop();
 				process();
-				FLSYSTEM_TRANSPLANTATION_INSTANCE->taskDelay(taskConfig.runTimeDelay);
+				FLSYSTEM_TRANSPLANTATION_INSTANCE->threadDelay(threadConfig.runTimeDelay);
 			}
-			FLSYSTEM_TRANSPLANTATION_INSTANCE->exitTask(nullptr);
 		}
-
-		virtual void begin() = 0;
-		virtual void loop() {}
 
 	public:
 		bool isBegin() { return processConfig.isBegin; }

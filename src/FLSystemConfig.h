@@ -11,13 +11,11 @@
 
 //#define FLSYSTEM_ENABLE_ARDUINO     //启用Arduino库
 
-#define FLSYSTEM_ENABLE_THREADLIB	1       //启用线程库 ( 0:C++标准线程库, 1:FreeRTOS库, 2:自定义 )
-#define FLSYSTEM_ENABLE_LVGL_8              //启用LVGL 8
-//#define FLSYSTEM_ENABLE_LVGL_TICK_SYNCH	//启用LVGL的Tick同步函数
+#define FLSYSTEM_ENABLE_THREADLIB	2	//启用线程库 ( 0:C++标准线程库, 1:FreeRTOS库, 2:自动/自定义(默认选项) )
 
 // FreeRTOS配置部分
 //#define FLSYSTEM_ENABLE_MAIN_THREAD // 启用后可以选择是否保留主线程不退出，注意，只有线程库允许可以继续循环的情况下才有作用
-// #define FLSYSTEM_ENABLE_FINE_DISTRIBUTION //开启后可以设置线程具体加载在哪个线程
+//#define FLSYSTEM_ENABLE_FINE_DISTRIBUTION //开启后可以设置线程具体加载在哪个线程
 
 #define FLSYSTEM_EXCEPTION_MODE 2 // 异常模式设置(0:使用throw, 1:使用abort, 2:自动)
 #endif

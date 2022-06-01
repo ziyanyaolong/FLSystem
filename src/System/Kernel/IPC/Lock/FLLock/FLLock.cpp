@@ -1,58 +1,72 @@
 #include "FLLock.h"
 
-FLSYSTEM::FLLock::FLLock(FLLock::Type type) : LockInterface()
+FLSYSTEM::FLLock::FLLock(FLLockType type)
 {
-	switch (type)
-	{
-	case FLSYSTEM::FLLock::Type::Atomic:
-#ifndef FLSYSTEM_ARDUINO_BOARD
-		flLock = new FLAtomicLock_Bool();
-#else
-		flLock = new FLFRLock(FLFRLock::Type::RecursiveMutex);
-#endif
-		break;
-
-	case FLSYSTEM::FLLock::Type::Binary:
-#ifndef FLSYSTEM_ARDUINO_BOARD
-		flLock = new FLMutex();
-#else
-		flLock = new FLFRLock(FLFRLock::Type::Binary);
-#endif
-		break;
-
-	case FLSYSTEM::FLLock::Type::Counting:
-#ifndef FLSYSTEM_ARDUINO_BOARD
-		flLock = new FLMutex();
-#else
-		flLock = new FLFRLock(FLFRLock::Type::Counting);
-#endif
-		break;
-
-	case FLSYSTEM::FLLock::Type::Mutex:
-#ifndef FLSYSTEM_ARDUINO_BOARD
-		flLock = new FLMutex();
-#else
-		flLock = new FLFRLock(FLFRLock::Type::Mutex);
-#endif
-		break;
-
-	case FLSYSTEM::FLLock::Type::RecursiveMutex:
-#ifndef FLSYSTEM_ARDUINO_BOARD
-		flLock = new FLMutex();
-#else
-		flLock = new FLFRLock(FLFRLock::Type::RecursiveMutex);
-#endif
-		break;
-
-	default:
-		break;
-	}
+	createLock(type);
 }
 
 FLSYSTEM::FLLock::~FLLock()
 {
-	if (flLock)
+	if (_lock)
 	{
-		delete flLock;
+		delete _lock;
 	}
+}
+
+bool FLSYSTEM::FLLock::createLock(FLSYSTEM::FLLockType type)
+{
+	if (_lock)
+	{
+		delete _lock;
+	}
+
+	switch (type)
+	{
+	case FLSYSTEM::FLLockType::UnknowType:
+		return (bool)(_lock = new FLSYSTEM::FLAtomicLock_Bool());
+		break;
+
+	case FLSYSTEM::FLLockType::Atomic:
+		return (bool)(_lock = new FLSYSTEM::FLAtomicLock_Bool());
+
+		break;
+
+	case FLSYSTEM::FLLockType::Binary:
+		return (bool)(_lock = new FLSYSTEM::FLSemaphore(FLSYSTEM::FLLockType::Binary));
+		break;
+
+	case FLSYSTEM::FLLockType::Counting:
+		return (bool)(_lock = new FLSYSTEM::FLSemaphore(FLSYSTEM::FLLockType::Counting));
+
+		break;
+
+	case FLSYSTEM::FLLockType::Mutex:
+		return (bool)(_lock = new FLSYSTEM::FLMutex(FLSYSTEM::FLLockType::Mutex));
+
+		break;
+
+	case FLSYSTEM::FLLockType::RecursiveMutex:
+		return (bool)(_lock = new FLSYSTEM::FLMutex(FLSYSTEM::FLLockType::RecursiveMutex));
+		break;
+
+	default:
+		return false;
+		break;
+	}
+	return false;
+}
+
+bool FLSYSTEM::FLLock::lock(unsigned long long time)
+{
+	return _lock->lock_FLLock();
+}
+
+void FLSYSTEM::FLLock::unlock()
+{
+	_lock->unlock_FLLock();
+}
+
+bool FLSYSTEM::FLLock::isLocking()
+{
+	return _lock->isLocking_FLLock();
 }

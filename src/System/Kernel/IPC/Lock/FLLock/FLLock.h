@@ -1,46 +1,39 @@
 #ifndef FLSYSTEM_FLLOCK_H
 #define FLSYSTEM_FLLOCK_H
 
-#include "../FLAtomicLock_Bool/FLAtomicLock_Bool.h"
+//#include "../FLAtomicLock_Bool/FLAtomicLock_Bool.h"
 #include "../FLMutex/FLMutex.h"
-#include "../Interface/LockInterface.h"
-#include "../FLFRLock/FLFRLock.h"
+#include "../FLAtomicLock_Bool/FLAtomicLock_Bool.h"
+#include "../FLSemaphore/FLSemaphore.h"
 
 namespace FLSYSTEM
 {
-	class FLLock : public LockInterface
+	class FLLock
 	{
 	private:
-		LockInterface* flLock = nullptr;
+		FLLockInterface* _lock = nullptr;
+		bool createLock(FLLockType type);
 
 	public:
-		enum class Type
-		{
-			Atomic,
-			Binary,
-			Counting,
-			Mutex,
-			RecursiveMutex
-		};
-
-		explicit FLLock(FLLock::Type type = FLLock::Type::Atomic);
+		explicit FLLock(FLLockType type = FLLockType::Atomic);
 		virtual ~FLLock();
 
-		virtual void lock()
+		bool lock(unsigned long long time = UINT64_MAX);
+
+		void unlock();
+
+		bool isLocking();
+
+		inline const FLLockType& typeGet()
 		{
-			flLock->lock();
+			return _lock->typeGet();
 		}
 
-		virtual void unlock()
+		template<typename T>
+		inline T* getLock()
 		{
-			flLock->unlock();
+			return static_cast<T*>(_lock);
 		}
-
-		virtual bool isLocking()
-		{
-			return flLock->isLocking();
-		}
-
 	};
 }
 

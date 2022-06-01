@@ -3,6 +3,7 @@
 
 #include "../EventAPI/EventAPI.h"
 #include "../../Kernel/IPC/IPC.h"
+#include "../../Kernel/IPC/Lock/FLLock/FLLock.h"
 
 namespace FLSYSTEM
 {
@@ -21,22 +22,39 @@ namespace FLSYSTEM
 			Ready
 		};
 
+	private:
+		FLLock _finishProcess;
+
 	protected:
-		FLSYSTEM_TRANSPLANTATION_TYPE::TaskConfig taskConfig;
+		FLSYSTEM_TRANSPLANTATION_TYPE::ThreadConfig threadConfig;
 		virtual void run() = 0;
-		virtual void exit_out() {}
-		virtual void process() override
+		inline virtual void exitOut() { _finishProcess.unlock(); }
+		inline virtual void process() override
 		{
 			EventCore::process(static_cast<EventAPI*>(this));
 		}
 
 	public:
-		explicit ThreadAPI(FLObject* object = nullptr, const std::string& name = std::string("")) : EventAPI(object, name) { isThread = true; }
-		ThreadAPI(const std::string &name) : EventAPI(name) { isThread = true; }
+		ThreadAPI(const std::string& name) : EventAPI(name) { isThread = true; }
+		explicit ThreadAPI(FLObject* object = nullptr, const std::string& name = std::string("")) : ThreadAPI(name) {}
 		virtual ~ThreadAPI() {}
 
-		FLSYSTEM_TRANSPLANTATION_TYPE::TaskConfig& getTaskConfig() { return taskConfig; }
-		FLSYSTEM_TRANSPLANTATION_TYPE::TaskConfig* getTaskConfigPointer() { return &taskConfig; }
+		inline virtual int exit() { _finishProcess.lock(); return 0; }
+		inline virtual void start() { run(); }
+
+		inline bool isExit() { return _finishProcess.isLocking(); }
+
+		inline void exec()
+		{
+			while (!_finishProcess.isLocking())
+			{
+				process();
+				FLSYSTEM_TRANSPLANTATION_INSTANCE->threadDelay(threadConfig.runTimeDelay);
+			}
+		}
+
+		FLSYSTEM_TRANSPLANTATION_TYPE::ThreadConfig& getThreadConfig() { return threadConfig; }
+		FLSYSTEM_TRANSPLANTATION_TYPE::ThreadConfig* getThreadConfigPointer() { return &threadConfig; }
 	};
 }
 

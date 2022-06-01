@@ -19,8 +19,6 @@ namespace FLSYSTEM
 
     private:
         FLQueue<EventTable *> eventQueue;
-        //std::atomic_bool isLoop;
-        //std::atomic_bool isEndLoop;
 
     protected:
         virtual void process() = 0;
@@ -32,23 +30,6 @@ namespace FLSYSTEM
         virtual ~EventAPI()
         {
             eventQueue.clear();
-        }
-
-        virtual void exec()
-        {
-            //isEndLoop.store(false);
-            //isLoop.store(true);
-            //while (isLoop.load())
-            //{
-            //    process();
-            //    FLTaskDelay(10);
-            //}
-            //isEndLoop.store(true);
-        }
-
-        void exit()
-        {
-            //isLoop.store(false);
         }
     };
 }

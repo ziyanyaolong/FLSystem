@@ -10,13 +10,14 @@
 
 namespace FLSYSTEM
 {
+	  
 	class FLSystem : public ProcessScheduleAPI
 	{
 	private:
 		Kernel kernel;
 		bool isRun = false;
 		FLQueue<ProcessScheduleAPI*> processList;
-		TransplantationInterface* transplantation = nullptr;
+		FLVector<ProcessScheduleAPI*> mergeList;
 
 	protected:
 		virtual void loop() override;
@@ -30,9 +31,7 @@ namespace FLSYSTEM
 		void setTransplantation() {}
 		void start();
 		void registerProcess(ProcessScheduleAPI* api);
-		void (*initInOther)(FLSystem* flSystem) = nullptr;
-		void (*runInOther)(FLSystem* flSystem) = nullptr;
-
+		void merge(ProcessScheduleAPI* api);
 	};
 }
 

@@ -1,11 +1,8 @@
 #ifndef FLSYSTEM_FLATOMICLOCK_H
 #define FLSYSTEM_FLATOMICLOCK_H
 
-#define FLSYSTEM_3RD_ATOMIC
-
+#include "../LockInterface/AtomicInterface.h"
 #include "../../../../../PlatformInterface/PlatformInterface.h"
-
-#ifndef FLSYSTEM_ARDUINO_BOARD
 
 namespace FLSYSTEM
 {
@@ -13,36 +10,48 @@ namespace FLSYSTEM
 	class FLAtomicLock
 	{
 	private:
-		std::atomic<T> lock;
+		AtomicInterface<T>* _atomicLock = nullptr;
 
 	public:
-		FLAtomicLock(T data) { lock.store(data); }
-		virtual ~FLAtomicLock() {}
-
-		void procesOperables(T data)
+		FLAtomicLock<T>(T data, FLLockType type = FLLockType::Atomic)
 		{
-			set(data);
-			operableData();
-			reset(data);
+			_atomicLock = FLSYSTEM_TRANSPLANTATION_INSTANCE->createAtomic<T>(type);
 		}
 
-		virtual void operableData()
+		virtual ~FLAtomicLock<T>() 
 		{
+			delete _atomicLock;
+			_atomicLock = nullptr;
 		}
 
-		T get()
+		FLLockType typeGet()
 		{
-			return lock.load();
+			return _atomicLock->typeGet();
 		}
 
-		bool wait(T data, std::size_t number = 0)
+		bool isAtomic()
 		{
-			T i = lock.load();
-			std::size_t count = 0;
+			if (typeGet() == FLLockType::Atomic)
+			{
+				return true;
+			}
+			else
+				return false;
+		}
+
+		T get() const
+		{
+			return _atomicLock->load();
+		}
+
+		bool wait(T data, unsigned long long number = UINT64_MAX)
+		{
+			T i = _atomicLock->load();
+			unsigned long long count = 0;
 
 			while (true)
 			{
-				if (number != 0)
+				if (number != UINT64_MAX)
 				{
 					count++;
 					if (count >= number)
@@ -53,23 +62,22 @@ namespace FLSYSTEM
 
 				if (i == data)
 				{
-					i = lock.load();
+					i = _atomicLock->load();
 					continue;
 				}
 
-				if (lock.compare_exchange_weak(i, data))
+				if (_atomicLock->compare_exchange_strong(i, data))
 					break;
 
 			}
 			return true;
 		}
-
+		
 		void direct(T data)
 		{
-			lock.store(data);
+			return _atomicLock->store(data);
 		}
 	};
 }
-#endif
 
 #endif

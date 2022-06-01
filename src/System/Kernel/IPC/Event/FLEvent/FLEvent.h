@@ -2,6 +2,7 @@
 #define FLSYSTEM_FLEVENT_H
 
 #include "../../../../../PlatformInterface/PlatformInterface.h"
+#include "../../Lock/FLLock/FLLock.h"
 
 #define FLRegisterEvent(name) namespace FLSYSTEM { namespace FLEventTypes { const FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType name = FLSYSTEM::FLEvent::registerEventType(); } }
 
@@ -26,14 +27,25 @@ namespace FLSYSTEM
 		FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType _type = static_cast<FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType>(FLEvent::Type::Normal);
 		static FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType _userType;
 		void* userData_ = nullptr;
+		bool _isCondense;
 
     public:
         FLEvent();
-        FLEvent(FLEvent::Type type) : _type(type) { FLEvent(); }
-		FLEvent(FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType type) : _type(type) { FLEvent(); }
+		FLEvent(FLEvent::Type type, bool isCondense = false) : FLEvent()
+		{
+			_type = static_cast<FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType>(type);
+			_isCondense = isCondense;
+		}
+
+		FLEvent(FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType type, bool isCondense = false) : FLEvent()
+		{
+			_type = type;
+			_isCondense = isCondense;
+		}
+
         virtual ~FLEvent();
 
-		const FLEvent::Type type() { return static_cast<FLEvent::Type>(_type); }
+		inline const FLEvent::Type type() { return static_cast<FLEvent::Type>(_type); }
 
 		static FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType registerEventType(FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType replacementValue = 0)
 		{
@@ -49,7 +61,7 @@ namespace FLSYSTEM
 			return (++_userType);
 		}
 
-		bool operator==(const FLEvent& event)
+		inline bool operator==(const FLEvent& event)
 		{
 			if (this->_type == event._type)
 			{
@@ -61,14 +73,19 @@ namespace FLSYSTEM
 			}
 		}
 
-		void setUserData(void* userData)
+		inline void setUserData(void* userData)
 		{
 			userData_ = userData;
 		}
 
-		void* getUserData() const
+		inline void* getUserData() const
 		{
 			return userData_;
+		}
+
+		inline bool isCondense()
+		{
+			return _isCondense;
 		}
 	};
 }

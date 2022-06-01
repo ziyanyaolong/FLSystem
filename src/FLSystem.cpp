@@ -13,12 +13,18 @@
 
 FLSYSTEM::FLSystem::FLSystem() : ProcessScheduleAPI()
 {
-	taskConfig.runTimeDelay = 5;
-	taskConfig.stackDepth = 4096;
+	threadConfig.runTimeDelay = 5;
+	threadConfig.stackDepth = 4096;
 }
 
 FLSYSTEM::FLSystem::~FLSystem()
 {
+	mergeList.clear();
+}
+
+void FLSYSTEM::FLSystem::merge(FLSYSTEM::ProcessScheduleAPI* api)
+{
+	mergeList.push_back(api);
 }
 
 bool FLSYSTEM::FLSystem::event(FLEvent* event)
@@ -45,35 +51,24 @@ void FLSYSTEM::FLSystem::registerProcess(ProcessScheduleAPI* api)
 
 void FLSYSTEM::FLSystem::begin()
 {
-#ifdef FLSYSTEM_3RD_LVGL
-	lv_init();
-#endif
 	kernel.init();
-
-	if (initInOther != nullptr)
+	mergeList.lock();
+	for (auto&& i = mergeList.begin(); i != mergeList.end(); i++)
 	{
-		initInOther(this);
+		(*i)->begin();
 	}
+	mergeList.unlock();
 }
 
 void FLSYSTEM::FLSystem::loop()
 {
-	if (runInOther != nullptr)
-	{
-		runInOther(this);
-	}
-
-#ifdef FLSYSTEM_3RD_LVGL
-	lv_task_handler();
-
-#ifdef FLSYSTEM_ENABLE_LVGL_TICK_SYNCH
-	lv_tick_inc(taskConfig.runTimeDelay);
-
-#endif
-
-#endif
 	kernel.run();
-
+	mergeList.lock();
+	for (auto&& i = mergeList.begin(); i != mergeList.end(); i++)
+	{
+		(*i)->loop();
+	}
+	mergeList.unlock();
 }
 
 void FLSYSTEM::FLSystem::start()
@@ -87,7 +82,7 @@ void FLSYSTEM::FLSystem::start()
 #if (FLSYSTEM_ENABLE_THREADLIB == 0)
 
 #ifndef FLSYSTEM_ENABLE_MAIN_THREAD
-	FLSYSTEM_TRANSPLANTATION_INSTANCE->taskDelay(0);
+	FLSYSTEM_TRANSPLANTATION_INSTANCE->exitThread(nullptr);
 
 #endif
 	
@@ -99,12 +94,20 @@ void FLSYSTEM::FLSystem::start()
 #else
 
 #ifndef FLSYSTEM_ENABLE_MAIN_THREAD
-	FLSYSTEM_TRANSPLANTATION_INSTANCE->exitTask(nullptr);
+	FLSYSTEM_TRANSPLANTATION_INSTANCE->exitThread(nullptr);
 
 #endif
 
 #endif
 	
+#elif (FLSYSTEM_ENABLE_THREADLIB == 2)
+
+#if ((!(defined(FLSYSTEM_SET_CUSTOM_TRANSPLANTATION))) && defined(FLSYSTEM_ENABLE_DEFAULT_LIBRARY))
+	FLSYSTEM_TRANSPLANTATION_INSTANCE->exitThread(nullptr);
+#endif
+
+
+
 #endif
 
 }
