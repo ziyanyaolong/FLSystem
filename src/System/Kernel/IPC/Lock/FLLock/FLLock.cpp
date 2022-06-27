@@ -2,7 +2,10 @@
 
 FLSYSTEM::FLLock::FLLock(FLLockType type)
 {
-	createLock(type);
+	if (!createLock(type))
+	{
+		FLSYSTEM_TRANSPLANTATION_INSTANCE->exception("Create Lock Fail!");
+	}
 }
 
 FLSYSTEM::FLLock::~FLLock()
@@ -28,7 +31,6 @@ bool FLSYSTEM::FLLock::createLock(FLSYSTEM::FLLockType type)
 
 	case FLSYSTEM::FLLockType::Atomic:
 		return (bool)(_lock = new FLSYSTEM::FLAtomicLock_Bool());
-
 		break;
 
 	case FLSYSTEM::FLLockType::Binary:

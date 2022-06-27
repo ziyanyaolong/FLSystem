@@ -15,6 +15,11 @@
 
 #include "../../3rdInclude.h"
 
+#define FLSYSTEM_FLVECTOR_TYPE FLSYSTEM_FLVECTOR_TYPE_DEFINE
+#define FLSYSTEM_FLLIST_TYPE FLSYSTEM_FLLIST_TYPE_DEFINE
+#define FLSYSTEM_FLQUEUE_TYPE FLSYSTEM_FLQUEUE_TYPE_DEFINE
+#define FLSYSTEM_FLMAP_TYPE FLSYSTEM_FLMAP_TYPE_DEFINE
+
 namespace FLSYSTEM
 {
 	class DefaultLibrary : public StandardAPI<DefaultLibrary>
@@ -25,7 +30,7 @@ namespace FLSYSTEM
 
 		struct DefaultConfig
 		{
-			const unsigned long long maxDelay = UINT64_MAX;
+			static const unsigned long long maxDelay = UINT32_MAX;
 		};
 
 		struct ThreadConfig
@@ -36,11 +41,12 @@ namespace FLSYSTEM
 			unsigned short stackDepth = 1024;
 			void* parameters = nullptr;
 			unsigned long priority = 1;
-			void** pxCreatedThread = nullptr;
+			void** createdThread = nullptr;
 			short coreID = 0;
 			unsigned long long runTimeDelay = 1;
 			long returned = 0;
 			void* threadClass = nullptr;
+			void* userData = nullptr;
 		};
 
 		long fl_createThread(void* data)
@@ -54,7 +60,7 @@ namespace FLSYSTEM
 			}
 			std::thread* mthread = new std::thread(pConfig->threadCode, data);
 			mthread->detach();
-			pConfig->pxCreatedThread = reinterpret_cast<void** const>(&mthread);
+			pConfig->createdThread = reinterpret_cast<void** const>(&mthread);
 			if (mthread == nullptr)
 			{
 				return 0;
@@ -65,18 +71,26 @@ namespace FLSYSTEM
 
 		void fl_exitThread(void* pointer)
 		{
+			auto pConfig = static_cast<ThreadConfig*>(pointer);
+
+			if (pConfig == nullptr || pConfig->threadCode == nullptr)
+			{
+				this->exception("Error:Not the correct configuration file.");
+				return;
+			}
+
 			while (true)
 			{
-				fl_threadDelay(INT64_MAX);
+				fl_threadDelay(DefaultConfig::maxDelay);
 			}
 		}
 
-		void fl_threadDelay(long long time)
+		void fl_threadDelay(unsigned long long time)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(time));
+			std::this_thread::sleep_for(std::chrono::milliseconds((uint32_t)time));
 		}
 
-		void fl_debugPrint(const char* str, void* data = nullptr)
+		void fl_debug(const char* str, void* data = nullptr)
 		{
 			std::cout << "Line:" << __LINE__ << ",FileName:" << __FILE__ << ",Debug:" << str;
 		}

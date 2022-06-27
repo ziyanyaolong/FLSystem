@@ -2,22 +2,27 @@
 
 FLSYSTEM::DisplayAPI::~DisplayAPI()
 {
+	if (displayData)
+	{
+		delete displayData;
+		displayData = nullptr;
+	}
 }
 
-#ifdef FLSYSTEM_3RD_LVGL
-bool FLSYSTEM::DisplayAPI::setDesktopBackground(const lv_img_dsc_t *DBs)
+FLSYSTEM::DisplayAPI::DisplayAPI(DisplayData* data, FLSYSTEM::FLObject* object, const std::string& name ) : Driver_API(object, name)
 {
-    desktopBackground = *DBs;
-    if (DBs != nullptr)
-    {
-        DB = lv_img_create(lv_scr_act());
-        lv_img_set_src(DB, &desktopBackground);
-        lv_obj_set_size(DB, this->displayData.screenWidget, this->displayData.screenHight);
-        lv_obj_set_pos(DB, 0, 0);
-        lv_obj_move_background(DB);
-        return true;
-    }
-    else
-        return false;
+	displayData = this->createDisplayData();
+	if (data)
+	{
+		displayData = data;
+	}
 }
-#endif
+
+FLSYSTEM::DisplayAPI::DisplayAPI(uint16_t screenWidget, uint16_t screenHight, uint32_t rotated, FLSYSTEM::FLObject* object, const std::string& name) : Driver_API(object, name)
+{
+	displayData = this->createDisplayData();
+	displayData->screenWidget = screenWidget;
+	displayData->screenHight = screenHight;
+	displayData->rotated = rotated;
+
+}

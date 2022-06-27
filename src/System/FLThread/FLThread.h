@@ -2,7 +2,7 @@
 #define FLSYSTEM_FLTHREAD_H
 
 #include "../../FLSystemConfig.h"
-#include "../API/ThreadAPI/ThreadAPI.h"
+#include "../Kernel/API/ThreadAPI/ThreadAPI.h"
 #include "../Kernel/kernel.h"
 
 namespace FLSYSTEM

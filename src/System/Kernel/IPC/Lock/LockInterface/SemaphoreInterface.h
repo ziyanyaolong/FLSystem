@@ -5,7 +5,7 @@
 
 namespace FLSYSTEM
 {
-	class SemaphoreInterface : public LockBaseInterface
+	FLInterface SemaphoreInterface : public LockBaseInterface
 	{
 	protected:
 		explicit SemaphoreInterface(FLLockType type, unsigned long long maxCount = 1, unsigned long long initialCount = 0) : LockBaseInterface(type) {}

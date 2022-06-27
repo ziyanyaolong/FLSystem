@@ -1,6 +1,8 @@
 #ifndef FLSYSTEM_LOCKBASEINTERFACE_H
 #define FLSYSTEM_LOCKBASEINTERFACE_H
 
+#include "../../../../../PlatformInterface/FLDefine.h"
+
 #define FLSYSTEM_3RD_STDINT
 #include "../../../../../PlatformInterface/3rdInclude.h"
 

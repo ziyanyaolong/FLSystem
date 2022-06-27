@@ -1,10 +1,10 @@
 #ifndef FLSYSTEM_PROCESSPOOL_H
 #define FLSYSTEM_PROCESSPOOL_H
 
-#include "../../../API/ProcessScheduleAPI/ProcessScheduleAPI.h"
-#include "../../../API/ThreadAPI/ThreadAPI.h"
-#include "../../../SafeSTL/FLMap/FLMap.h"
-#include "../../../SafeSTL/FLVector/FLVector.h"
+#include "../../API/ProcessScheduleAPI/ProcessScheduleAPI.h"
+#include "../../API/ThreadAPI/ThreadAPI.h"
+#include "../../Arch/SafeSTL/FLMap/FLMap.h"
+#include "../../Arch/SafeSTL/FLVector/FLVector.h"
 
 #define FLSYSTEM_3RD_ALGORITHM
 

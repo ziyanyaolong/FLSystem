@@ -1,7 +1,7 @@
 #ifndef FLSYSTEM_FLLOCK_H
 #define FLSYSTEM_FLLOCK_H
 
-//#include "../FLAtomicLock_Bool/FLAtomicLock_Bool.h"
+#include "../../../../../PlatformInterface/FLDefine.h"
 #include "../FLMutex/FLMutex.h"
 #include "../FLAtomicLock_Bool/FLAtomicLock_Bool.h"
 #include "../FLSemaphore/FLSemaphore.h"
@@ -19,12 +19,10 @@ namespace FLSYSTEM
 		virtual ~FLLock();
 
 		bool lock(unsigned long long time = UINT64_MAX);
-
 		void unlock();
-
 		bool isLocking();
 
-		inline const FLLockType& typeGet()
+		inline FLLockType typeGet()
 		{
 			return _lock->typeGet();
 		}

@@ -1,10 +1,12 @@
 #ifndef FLSYSTEM_EXCEPTIONINTERFACE_H
 #define FLSYSTEM_EXCEPTIONINTERFACE_H
 
+#include "../../../FLDefine.h"
+
 namespace FLSYSTEM
 {
 	template <typename _TI>
-	class ExceptionInterface
+	FLInterface ExceptionInterface
 	{
 	private:
 		_TI* getTI()

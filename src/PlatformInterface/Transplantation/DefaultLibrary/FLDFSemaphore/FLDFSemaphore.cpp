@@ -2,7 +2,7 @@
 
 #ifdef FLSYSTEM_ENABLE_DEFAULT_LIBRARY
 
-FLSYSTEM::FLDFSemaphore::FLDFSemaphore(FLLockType type, unsigned long long maxCount, unsigned long long initialCount) : SemaphoreInterface(type), _mutex(new FLDFMutex(FLLockType::Mutex)), count(initialCount)
+FLSYSTEM::FLDFSemaphore::FLDFSemaphore(FLLockType type, unsigned long long maxCount, unsigned long long initialCount) : SemaphoreInterface(type), _mutex(new FLDFMutex(FLLockType::Mutex)), count((long)initialCount)
 {
 	if (type == FLLockType::Counting)
 	{
@@ -29,7 +29,7 @@ FLSYSTEM::FLDFSemaphore::~FLDFSemaphore()
 
 inline void FLSYSTEM::FLDFSemaphore::give()
 {
-	if (count >= _semaphoreData->maxCount)
+	if ((count >= _semaphoreData->maxCount) || (count == 0))
 	{
 		return;
 	}
@@ -68,6 +68,10 @@ inline bool FLSYSTEM::FLDFSemaphore::take(unsigned long long time)
 			break;
 		}
 	}
+
+	_mutex->unlock();
+
+	return false;
 }
 
 inline bool FLSYSTEM::FLDFSemaphore::get()

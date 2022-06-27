@@ -1,6 +1,8 @@
 #ifndef FLSYSTEM_PLATFORMINTERFACE_H
 #define FLSYSTEM_PLATFORMINTERFACE_H
 
+#include "FLDefine.h"
+
 #include "FLTRSwitch.h"
 
 #ifdef FLSYSTEM_ENABLE_LVGL_8
@@ -9,7 +11,7 @@
 
 #include "3rdInclude.h"
 
-#ifndef FLSYSTEM_ESPRESSIF_BOARD
+#if (!defined(FLSYSTEM_ESPRESSIF_BOARD) && (!(defined(FLSYSTEM_ENABLE_DEFAULT_LIBRARY))))
 #define FLSYSTEM_TASK_START_SCHEDULER
 #endif
 

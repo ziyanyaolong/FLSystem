@@ -2,8 +2,8 @@
 #define FLSYSTEM_EVENTCORE_H
 
 #include "../../../../../PlatformInterface/PlatformInterface.h"
-#include "../../../../API/EventAPI/EventAPI.h"
-#include "../../../../SafeSTL/FLQueue/FLQueue.h"
+#include "../../../API/EventAPI/EventAPI.h"
+#include "../../../Arch/SafeSTL/FLQueue/FLQueue.h"
 #include "../FLEvent/FLEvent.h"
 
 namespace FLSYSTEM

@@ -5,7 +5,7 @@
 
 namespace FLSYSTEM
 {
-	class MutexInterface : public LockBaseInterface
+	FLInterface MutexInterface : public LockBaseInterface
 	{
 	protected:
 		explicit MutexInterface(FLLockType type) : LockBaseInterface(type) {}

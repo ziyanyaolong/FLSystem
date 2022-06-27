@@ -2,8 +2,8 @@
 #define FLSYSTEM_IPC_H
 
 #include "../../../FLSystemConfig.h"
-#include "../../Object/FLObject.h"
-#include "../../SafeSTL/FLQueue/FLQueue.h"
+#include "../Arch/Object/FLObject.h"
+#include "../Arch/SafeSTL/FLQueue/FLQueue.h"
 #include "Event/EventCore/EventCore.h"
 #include "Event/FLEvent/FLEvent.h"
 

@@ -6,7 +6,7 @@
 namespace FLSYSTEM
 {
 	template <typename _Ty>
-	class AtomicInterface : public LockBaseInterface
+	FLInterface AtomicInterface : public LockBaseInterface
 	{
 	protected:
 		explicit AtomicInterface<_Ty>(FLLockType type) : LockBaseInterface(type) {}

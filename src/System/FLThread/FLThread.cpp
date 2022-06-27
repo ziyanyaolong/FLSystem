@@ -2,41 +2,41 @@
 
 FLSYSTEM::FLThread::FLThread(FLObject* parent) : ThreadAPI(parent)
 {
-    //mutex = ::xSemaphoreCreateMutex();
+	//mutex = ::xSemaphoreCreateMutex();
 
-    //if (mutex == nullptr)
-    //{
-    //    throw std::string("ERROR:Unable to create mutex. - " + this->readName());
-    //}
+	//if (mutex == nullptr)
+	//{
+	//    throw std::string("ERROR:Unable to create mutex. - " + this->readName());
+	//}
 }
 
 FLSYSTEM::FLThread::~FLThread()
 {
-    //::vSemaphoreDelete(mutex);
+	//::vSemaphoreDelete(mutex);
 }
 
 bool FLSYSTEM::FLThread::wait(int64_t time)
 {
-    //return ::xSemaphoreTake(mutex, time);
-    return true;
+	//return ::xSemaphoreTake(mutex, time);
+	return true;
 }
 
 void FLSYSTEM::FLThread::quit()
 {
-    exit();
-    // this->postEvent(this, new FLEvent(FLEvent::Type::ExitLoop));
+	exit();
+	// this->postEvent(this, new FLEvent(FLEvent::Type::ExitLoop));
 }
 
 void FLSYSTEM::FLThread::exit_out()
 {
-    //::xSemaphoreGive(mutex);
+	//::xSemaphoreGive(mutex);
 }
 
 void FLSYSTEM::FLThread::start()
 {
-    if(isStart)
-        return;
+	if (isStart)
+		return;
 
-    isStart = true;
-    Kernel::processSchedule.createThread(this);
+	isStart = true;
+	Kernel::processSchedule.createThread(this);
 }

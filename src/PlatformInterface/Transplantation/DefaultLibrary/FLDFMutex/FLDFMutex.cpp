@@ -28,7 +28,7 @@ inline bool FLSYSTEM::FLDFMutex::lock(unsigned long long  time)
 		if (time == UINT64_MAX)
 		{
 			static_cast<std::timed_mutex*>(_mutex)->lock();
-		} 
+		}
 		else
 		{
 			if (!(static_cast<std::timed_mutex*>(_mutex)->try_lock_for(std::chrono::milliseconds(time))))
@@ -101,9 +101,9 @@ inline bool FLSYSTEM::FLDFMutex::isLocking()
 	return _isLooking;
 }
 
-inline void* FLSYSTEM::FLDFMutex::getLock() 
-{ 
-	return _mutex; 
+inline void* FLSYSTEM::FLDFMutex::getLock()
+{
+	return _mutex;
 }
 
 #endif

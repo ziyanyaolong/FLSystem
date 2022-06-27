@@ -7,11 +7,6 @@ FLSYSTEM::EventCore::EventCore() : EventAPI()
 
 FLSYSTEM::EventCore::~EventCore()
 {
-	//exit();
-	//while (!isEndLoop.load())
-	//{
-	//	FLTaskDelay(10);
-	//}
 }
 
 void FLSYSTEM::EventCore::process(EventAPI* eventAPI)
@@ -27,19 +22,33 @@ void FLSYSTEM::EventCore::process(EventAPI* eventAPI)
 	eventTable = nullptr;
 }
 
-bool FLSYSTEM::EventCore::sendEvent(FLObject *receiver, FLEvent *event)
+bool FLSYSTEM::EventCore::sendEvent(FLObject* receiver, FLEvent* event)
 {
 	return notify(receiver, event);
 }
 
-bool FLSYSTEM::EventCore::postEvent(FLObject *receiver, FLEvent *event)
+bool FLSYSTEM::EventCore::postEvent(FLObject* receiver, FLEvent* event)
 {
-	if (receiver->isThread)
+	if (receiver == nullptr || event == nullptr)
+	{
+		return false;
+	}
+	else if (receiver->isThread)
 	{
 		EventTable* et = new EventTable();
 		et->object = receiver;
 		et->event = event;
-		return (static_cast<EventCore*>(receiver))->eventQueue.push_back(et);
+		if ((static_cast<EventCore*>(receiver))->eventQueue.push_back(et))
+		{
+			return true;
+		}
+		else
+		{
+			delete event;
+			event = nullptr;
+			delete et;
+			return false;
+		}
 	}
 	auto parent = receiver;
 	while (true)
@@ -50,10 +59,20 @@ bool FLSYSTEM::EventCore::postEvent(FLObject *receiver, FLEvent *event)
 		}
 		else if (parent->isThread)
 		{
-			EventTable *et = new EventTable();
+			EventTable* et = new EventTable();
 			et->object = receiver;
 			et->event = event;
-			return (static_cast<EventCore*>(parent))->eventQueue.push_back(et);
+			if ((static_cast<EventCore*>(parent))->eventQueue.push_back(et))
+			{
+				return true;
+			}
+			else
+			{
+				delete event;
+				event = nullptr;
+				delete et;
+				return false;
+			}
 		}
 
 		parent = parent->getParent();
@@ -62,7 +81,7 @@ bool FLSYSTEM::EventCore::postEvent(FLObject *receiver, FLEvent *event)
 	return false;
 }
 
-bool FLSYSTEM::EventCore::notify(FLObject *object, FLEvent *event)
+bool FLSYSTEM::EventCore::notify(FLObject* object, FLEvent* event)
 {
 	if (object == nullptr || event == nullptr)
 	{
@@ -113,7 +132,7 @@ FLSYSTEM::EventCore::EventTable* FLSYSTEM::EventCore::condense(EventAPI* eventAP
 	{
 		return nullptr;
 	}
-	
+
 	EventTable* eventTable = nullptr;
 	bool isCompare = true;
 

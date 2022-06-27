@@ -1,6 +1,8 @@
 #ifndef FLSYSMTE_TRANSPLANTATIONINTERFACE_H
 #define FLSYSMTE_TRANSPLANTATIONINTERFACE_H
 
+#include "../../FLTRSwitch.h"
+
 #include "DebugInterface/DebugInterface.h"
 #include "ExceptionInterface/ExceptionInterface.h"
 #include "MemoryInterface/MemoryInterface.h"
@@ -10,7 +12,7 @@
 namespace FLSYSTEM
 {
 	template <typename _TI>
-	class TransplantationInterface 
+	FLInterface TransplantationInterface
 		: public DebugInterface<_TI>,
 		public ExceptionInterface<_TI>,
 		public MemoryInterface<_TI>,

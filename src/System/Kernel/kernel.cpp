@@ -13,12 +13,12 @@ FLSYSTEM::Kernel::~Kernel()
 
 void FLSYSTEM::Kernel::init()
 {
-    ipc.begin();
-    processSchedule.begin();
+	ipc.begin();
+	processSchedule.begin();
 }
 
 void FLSYSTEM::Kernel::run()
 {
-    ipc.run();
-    processSchedule.run();
+	ipc.run();
+	processSchedule.run();
 }

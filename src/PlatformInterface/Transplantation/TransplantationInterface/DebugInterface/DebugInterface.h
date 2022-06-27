@@ -1,10 +1,13 @@
 #ifndef FLSYSTEM_DEBUGINTERFACE_H
 #define FLSYSTEM_DEBUGINTERFACE_H
 
+#include "../../../FLDefine.h"
+#include "../../../../FLSystemConfig.h"
+
 namespace FLSYSTEM
 {
 	template <typename _TI>
-	class DebugInterface
+	FLInterface DebugInterface
 	{
 	private:
 		_TI* getTI()
@@ -18,9 +21,11 @@ namespace FLSYSTEM
 	public:
 		virtual ~DebugInterface<_TI>() {}
 
-		inline void debugPrint(const char* str, void* data = nullptr)
+		inline void debug(const char* str, void* data = nullptr)
 		{
-			this->getTI()->fl_debugPrint(str, data);
+#ifdef FLSYSTEM_DEBUG_OPEN
+			this->getTI()->fl_debug(str, data);
+#endif
 		}
 
 

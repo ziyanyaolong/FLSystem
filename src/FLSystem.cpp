@@ -79,35 +79,14 @@ void FLSYSTEM::FLSystem::start()
 		kernel.processSchedule.createThread(this);
 	}
 
-#if (FLSYSTEM_ENABLE_THREADLIB == 0)
-
-#ifndef FLSYSTEM_ENABLE_MAIN_THREAD
-	FLSYSTEM_TRANSPLANTATION_INSTANCE->exitThread(nullptr);
-
-#endif
-	
-#elif (FLSYSTEM_ENABLE_THREADLIB == 1)
-
 #ifdef FLSYSTEM_TASK_START_SCHEDULER
 	vTaskStartScheduler();
-
-#else
-
-#ifndef FLSYSTEM_ENABLE_MAIN_THREAD
-	FLSYSTEM_TRANSPLANTATION_INSTANCE->exitThread(nullptr);
-
 #endif
 
+#if ((!defined(FLSYSTEM_ENABLE_MAIN_THREAD)) && (!(defined(FLSYSTEM_TASK_START_SCHEDULER))))
+	while (true)
+	{
+		FLSYSTEM_TRANSPLANTATION_INSTANCE->threadDelay(UINT64_MAX);
+	}
 #endif
-	
-#elif (FLSYSTEM_ENABLE_THREADLIB == 2)
-
-#if ((!(defined(FLSYSTEM_SET_CUSTOM_TRANSPLANTATION))) && defined(FLSYSTEM_ENABLE_DEFAULT_LIBRARY))
-	FLSYSTEM_TRANSPLANTATION_INSTANCE->exitThread(nullptr);
-#endif
-
-
-
-#endif
-
 }

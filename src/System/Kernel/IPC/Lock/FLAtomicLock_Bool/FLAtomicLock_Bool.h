@@ -4,8 +4,6 @@
 #include "../FLAtomicLock/FLAtomicLock.h"
 #include "../LockInterface/FLLockInterface.h"
 
-#ifndef FLSYSTEM_ARDUINO_BOARD
-
 namespace FLSYSTEM
 {
 	class FLAtomicLock_Bool : public FLAtomicLock<bool>, public FLLockInterface
@@ -82,7 +80,5 @@ namespace FLSYSTEM
 		}
 	};
 }
-
-#endif
 
 #endif

@@ -2,6 +2,10 @@
 #include <stdint.h>
 #endif
 
+#ifdef FLSYSTEM_3RD_CSTDDEF
+#include <cstddef>
+#endif
+
 #ifdef FLSYSTEM_3RD_IOSTREAM
 #include <iostream>
 #endif
@@ -10,9 +14,18 @@
 #include<string>
 #endif
 
+#ifdef FLSYSTEM_3RD_STRINGTOC
+#include<string.h>
+#endif
+
 #ifdef FLSYSTEM_3RD_THREAD
 #include <thread>
 #endif
+
+#ifdef FLSYSTEM_3RD_LVGL
+#include "lvgl.h"
+#endif
+
 
 #ifdef FLSYSTEM_3RD_ALGORITHM
 #include <algorithm>
@@ -60,22 +73,20 @@
 #include <Arduino.h>
 #endif
 
-#ifdef FLSYSTEM_3RD_FREERTOS
+#ifdef FLSYSTEM_3RD_FREERTOS_NORMAL
+#include <FreeRTOS.h>
+#endif
 
-#ifdef FLSYSTEM_ARDUINO_BOARD
+#ifdef FLSYSTEM_3RD_FREERTOS_ARDUINO
 #include <Arduino_FreeRTOS.h>
 #include <semphr.h>
-#else
-#include <FreeRTOS.h>
+#endif
 
-#if _MSC_VER > 0
+#ifdef FLSYSTEM_3RD_FREERTOS_MSC_VER
+#include "FreeRTOS.h"
 #include "task.h"
 #include <Windows.h>
 #include "queue.h"
 #include "semphr.h"
 #include "resource.h"
-#endif
-
-#endif
-
 #endif

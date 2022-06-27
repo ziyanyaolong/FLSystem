@@ -15,6 +15,13 @@
 
 #include "../../3rdInclude.h"
 
+#include "FLFRQueue/FLFRQueue.h"
+
+#define FLSYSTEM_FLVECTOR_TYPE FLSYSTEM_FLVECTOR_TYPE_DEFINE
+#define FLSYSTEM_FLLIST_TYPE FLSYSTEM_FLLIST_TYPE_DEFINE
+#define FLSYSTEM_FLQUEUE_TYPE FLSYSTEM::FLFRQueue
+#define FLSYSTEM_FLMAP_TYPE FLSYSTEM_FLMAP_TYPE_DEFINE
+
 namespace FLSYSTEM
 {
 	class FreeRTOSLibrary : public StandardAPI<FreeRTOSLibrary>
@@ -25,7 +32,7 @@ namespace FLSYSTEM
 
 		struct DefaultConfig
 		{
-			const TickType_t maxDelay = portMAX_DELAY;
+			static const TickType_t maxDelay = portMAX_DELAY;
 		};
 
 		struct ThreadConfig
@@ -38,8 +45,9 @@ namespace FLSYSTEM
 			TaskHandle_t* createdThread = nullptr;
 			short coreID = 0;
 			BaseType_t returned = 0;
-			unsigned long long runTimeDelay = 5;
+			TickType_t runTimeDelay = 5;
 			void* threadClass = nullptr;
+			void* userData = nullptr;
 		};
 
 		long fl_createThread(void* data)
@@ -73,7 +81,20 @@ namespace FLSYSTEM
 
 		void fl_exitThread(void* pointer)
 		{
-			vTaskDelete(pointer);
+			if (pointer == nullptr)
+			{
+				vTaskDelete(nullptr);
+			}
+
+			auto pConfig = static_cast<ThreadConfig*>(pointer);
+
+			if (pConfig == nullptr || pConfig->threadCode == nullptr)
+			{
+				this->exception("Error:Not the correct configuration file.");
+				return;
+			}
+
+			vTaskDelete(*(pConfig->createdThread));
 		}
 
 		void fl_threadDelay(unsigned long long time)
@@ -81,7 +102,7 @@ namespace FLSYSTEM
 			vTaskDelay((TickType_t)time);
 		}
 
-		void fl_debugPrint(const char* str, void* data = nullptr)
+		void fl_debug(const char* str, void* data = nullptr)
 		{
 			printf("Line:%d, FileName:%s, Debug:%s\n", __LINE__, __FILE__, str);
 		}
@@ -99,7 +120,7 @@ namespace FLSYSTEM
 
 		inline SemaphoreInterface* fl_createSemaphore(FLLockType type, unsigned long long maxCount = 1, unsigned long long initialCount = 0)
 		{
-			return static_cast<SemaphoreInterface*>(new FLFRSemaphore(type, maxCount, initialCount));
+			return static_cast<SemaphoreInterface*>(new FLFRSemaphore(type, (UBaseType_t)maxCount, (UBaseType_t)initialCount));
 		}
 
 	};

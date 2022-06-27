@@ -1,10 +1,12 @@
 #ifndef FLSYSTEM_MEMORYINTERFACE_H
 #define FLSYSTEM_MEMORYINTERFACE_H
 
+#include "../../../FLDefine.h"
+
 namespace FLSYSTEM
 {
 	template <typename _TI>
-	class MemoryInterface
+	FLInterface MemoryInterface
 	{
 	private:
 		_TI* getTI()

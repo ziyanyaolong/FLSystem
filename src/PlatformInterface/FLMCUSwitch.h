@@ -1,3 +1,6 @@
+#ifndef FLSYSTEM_MCUSWITCH_H
+#define FLSYSTEM_MCUSWITCH_H
+
 #include "../FLSystemConfig.h"
 
 //框架配置部分
@@ -24,4 +27,13 @@
 #endif
 #endif
 
+#ifndef FLSYSTEM_UNKNOW_BOARD
+#define FLSYSTEM_MCU_PLATFORM
+#else
+#define FLSYSTEM_NORMAL_PLATFORM
+#endif
+
+
 #include "3rdInclude.h"
+
+#endif

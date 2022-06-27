@@ -1,10 +1,12 @@
 #ifndef FLSYSTEM_THREADINTERFACE_H
 #define FLSYSTEM_THREADINTERFACE_H
 
+#include "../../../FLDefine.h"
+
 namespace FLSYSTEM
 {
 	template <typename _TI>
-	class ThreadInterface
+	FLInterface ThreadInterface
 	{
 	private:
 		_TI* getTI()

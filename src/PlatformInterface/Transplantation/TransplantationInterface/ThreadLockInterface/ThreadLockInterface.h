@@ -1,17 +1,20 @@
 #ifndef FLSYSTEM_THREADLOCKINTERFACE_H
 #define FLSYSTEM_THREADLOCKINTERFACE_H
 
+#include "../../../FLDefine.h"
+
 namespace FLSYSTEM
 {
 	template <typename _Ty>
-	class AtomicInterface;
+	FLInterface AtomicInterface;
 
-	class MutexInterface;
-	class SemaphoreInterface;
+	FLInterface MutexInterface;
+	FLInterface SemaphoreInterface;
+
 	enum class FLLockType;
 
 	template <typename _TI>
-	class ThreadLockInterface
+	FLInterface ThreadLockInterface
 	{
 	private:
 		_TI* getTI()
