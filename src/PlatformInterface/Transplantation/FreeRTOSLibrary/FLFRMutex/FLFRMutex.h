@@ -17,7 +17,6 @@ namespace FLSYSTEM
 	{
 	private:
 		SemaphoreHandle_t _mutex = nullptr;
-		bool _isLocking = false;
 
 	public:
 		explicit FLFRMutex(FLLockType type = FLLockType::Mutex);
@@ -25,7 +24,6 @@ namespace FLSYSTEM
 
 		virtual bool lock(unsigned long long  xTicksToWait = UINT64_MAX) override;
 		virtual void unlock() override;
-		virtual bool isLocking() override;
 
 	};
 }

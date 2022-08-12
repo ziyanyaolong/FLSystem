@@ -38,7 +38,7 @@ bool FLSYSTEM::EventCore::postEvent(FLObject* receiver, FLEvent* event)
 		EventTable* et = new EventTable();
 		et->object = receiver;
 		et->event = event;
-		if ((static_cast<EventCore*>(receiver))->eventQueue.push_back(et))
+		if ((static_cast<EventAPI*>(receiver))->eventQueue.push_back(et))
 		{
 			return true;
 		}
@@ -50,6 +50,7 @@ bool FLSYSTEM::EventCore::postEvent(FLObject* receiver, FLEvent* event)
 			return false;
 		}
 	}
+
 	auto parent = receiver;
 	while (true)
 	{
@@ -62,7 +63,7 @@ bool FLSYSTEM::EventCore::postEvent(FLObject* receiver, FLEvent* event)
 			EventTable* et = new EventTable();
 			et->object = receiver;
 			et->event = event;
-			if ((static_cast<EventCore*>(parent))->eventQueue.push_back(et))
+			if ((static_cast<EventAPI*>(parent))->eventQueue.push_back(et))
 			{
 				return true;
 			}

@@ -74,16 +74,16 @@ inline bool FLSYSTEM::FLDFSemaphore::take(unsigned long long time)
 	return false;
 }
 
-inline bool FLSYSTEM::FLDFSemaphore::get()
-{
-	if (count != 0)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
+//inline bool FLSYSTEM::FLDFSemaphore::get()
+//{
+//	if (count != 0)
+//	{
+//		return true;
+//	}
+//	else
+//	{
+//		return false;
+//	}
+//}
 
 #endif

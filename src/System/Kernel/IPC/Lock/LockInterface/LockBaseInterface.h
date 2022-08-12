@@ -29,7 +29,7 @@ namespace FLSYSTEM
 	public:
 		virtual ~LockBaseInterface() {}
 
-		inline const FLLockType& typeGet()
+		inline const FLLockType& typeGet() const
 		{
 			return _type;
 		}

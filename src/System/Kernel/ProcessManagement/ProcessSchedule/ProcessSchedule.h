@@ -6,15 +6,17 @@
 #include "../../API/ThreadAPI/ThreadAPI.h"
 #include "../ProcessPool/ProcessPool.h"
 #include "../../IPC/Lock/FLAtomicLock_Bool/FLAtomicLock_Bool.h"
+#include "../../API/KernelAPI/KernelAPI.h"
+#include "../../API/GC_API/GC_API.h"
 
 namespace FLSYSTEM
 {
-    class ProcessSchedule
+    class ProcessSchedule : public KernelAPI<ProcessSchedule>, public GC_API
     {
     private:
-        friend class Kernel;
-        FLLock createThreadLock;
-        static ProcessPool processPool;
+        FLLock* createThreadLock = nullptr;
+        ProcessPool* processPool = nullptr;
+
         static void _runMiddle_T(void *thread);
         static void _runMiddle_P(void *process);
 
@@ -22,10 +24,14 @@ namespace FLSYSTEM
         int createProcess(ProcessScheduleAPI *process);
         int createThread(ThreadAPI *process);
 
-        void begin();
-        void run();
+		void deleteProcess(ProcessScheduleAPI* process);
+		void deleteThread(ThreadAPI* process);
 
-        ProcessSchedule();
+        virtual void init() override;
+        virtual void run() override;
+        virtual bool load() override;
+
+        explicit ProcessSchedule();
         virtual ~ProcessSchedule();
     };
 }

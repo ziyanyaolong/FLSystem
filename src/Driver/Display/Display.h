@@ -15,8 +15,7 @@ namespace FLSYSTEM
         Registry<DisplayAPI*> displayList;
 
     public:
-        Display(const std::string &name) : Driver_API(name) {}
-        Display(const char *name) : Driver_API(name) {}
+        Display(FLObject* parent = nullptr, const std::string &name = std::string("")) : Driver_API(parent, name) {}
 
         virtual ~Display();
 

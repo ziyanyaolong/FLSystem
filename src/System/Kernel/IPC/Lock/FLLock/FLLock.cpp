@@ -1,6 +1,6 @@
 #include "FLLock.h"
 
-FLSYSTEM::FLLock::FLLock(FLLockType type)
+FLSYSTEM::FLLock::FLLock(FLLockType type) : GC_API()
 {
 	if (!createLock(type))
 	{
@@ -55,20 +55,18 @@ bool FLSYSTEM::FLLock::createLock(FLSYSTEM::FLLockType type)
 		return false;
 		break;
 	}
+
 	return false;
 }
 
 bool FLSYSTEM::FLLock::lock(unsigned long long time)
 {
+	_isLocked = true;
 	return _lock->lock_FLLock();
 }
 
 void FLSYSTEM::FLLock::unlock()
 {
+	_isLocked = false;
 	_lock->unlock_FLLock();
-}
-
-bool FLSYSTEM::FLLock::isLocking()
-{
-	return _lock->isLocking_FLLock();
 }

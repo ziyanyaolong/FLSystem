@@ -12,7 +12,7 @@ namespace FLSYSTEM
 	class FLMap : public STL_Basic
 	{
 	public:
-		FLMap() : STL_Basic() {}
+		FLMap(FLMap::Mode mode = FLMap::Mode::HaveLock) : STL_Basic(mode) {}
 		virtual ~FLMap() {}
 
 		TValue& operator[](const TKey& key) 

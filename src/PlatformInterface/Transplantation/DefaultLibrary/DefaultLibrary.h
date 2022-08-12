@@ -13,6 +13,10 @@
 
 #define FLSYSTEM_3RD_IOSTREAM
 
+#ifdef FLSYSTEM_ENABLE_LVGL_MEMORY_MANAGEMENT
+#define FLSYSTEM_3RD_LVGL
+#endif
+
 #include "../../3rdInclude.h"
 
 #define FLSYSTEM_FLVECTOR_TYPE FLSYSTEM_FLVECTOR_TYPE_DEFINE
@@ -38,16 +42,26 @@ namespace FLSYSTEM
 			typedef void (*_ThreadFun_)(void*);
 			_ThreadFun_ threadCode = nullptr;
 			const char* const name = "";
-			unsigned short stackDepth = 1024;
+			unsigned long stackDepth = 1024;
 			void* parameters = nullptr;
 			unsigned long priority = 1;
-			void** createdThread = nullptr;
+			std::thread* createdThread = nullptr;
 			short coreID = 0;
-			unsigned long long runTimeDelay = 1;
+			unsigned long long runTimeDelay = 50;
 			long returned = 0;
 			void* threadClass = nullptr;
+			FLDFAtomic<bool> threadExit_Bool;
 			void* userData = nullptr;
 		};
+
+		static void _thread_run_func_(ThreadConfig* data)
+		{
+			while (!(data->threadExit_Bool.load()))
+			{
+				data->threadCode(data);
+				break;
+			}
+		}
 
 		long fl_createThread(void* data)
 		{
@@ -58,9 +72,11 @@ namespace FLSYSTEM
 				this->exception("Error:Not the correct configuration file.");
 				return 0;
 			}
-			std::thread* mthread = new std::thread(pConfig->threadCode, data);
+
+			pConfig->threadExit_Bool.store(false);
+			std::thread* mthread = new std::thread(&DefaultLibrary::_thread_run_func_, pConfig);
 			mthread->detach();
-			pConfig->createdThread = reinterpret_cast<void** const>(&mthread);
+			pConfig->createdThread = mthread;
 			if (mthread == nullptr)
 			{
 				return 0;
@@ -73,21 +89,46 @@ namespace FLSYSTEM
 		{
 			auto pConfig = static_cast<ThreadConfig*>(pointer);
 
-			if (pConfig == nullptr || pConfig->threadCode == nullptr)
+			if (pConfig == nullptr || pConfig->createdThread == nullptr)
 			{
 				this->exception("Error:Not the correct configuration file.");
 				return;
 			}
 
-			while (true)
-			{
-				fl_threadDelay(DefaultConfig::maxDelay);
-			}
+			pConfig->threadExit_Bool.store(true);
 		}
 
-		void fl_threadDelay(unsigned long long time)
+		void fl_threadDelay(void* timeData)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds((uint32_t)time));
+			auto pConfig = static_cast<ThreadDelayConfig*>(timeData);
+
+			if (pConfig == nullptr)
+			{
+				this->exception("Error:Not the correct configuration file.");
+				return;
+			}
+
+			if (pConfig->threadConfig == nullptr)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(pConfig->time));
+				return;
+			}
+			else
+			{
+				long long time = 0;
+				while (!(pConfig->threadConfig->threadExit_Bool.load()))
+				{
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
+					time++;
+
+					if (time >= long long(pConfig->time / 2))
+					{
+						break;
+					}
+				}
+			}
+
+			return;
 		}
 
 		void fl_debug(const char* str, void* data = nullptr)
@@ -95,10 +136,10 @@ namespace FLSYSTEM
 			std::cout << "Line:" << __LINE__ << ",FileName:" << __FILE__ << ",Debug:" << str;
 		}
 
-		template <typename _Ty>
-		inline AtomicInterface<_Ty>* fl_createAtomic(FLLockType type)
+		template <typename _Ty, typename ... _Args>
+		inline AtomicInterface<_Ty>* fl_createAtomic(FLLockType type, _Args ... args)
 		{
-			return static_cast<AtomicInterface<_Ty>*>(new FLDFAtomic<_Ty>(type));
+			return static_cast<AtomicInterface<_Ty>*>(new FLDFAtomic<_Ty>(type, args...));
 		}
 
 		inline MutexInterface* fl_createMutex(FLLockType type)
@@ -110,7 +151,6 @@ namespace FLSYSTEM
 		{
 			return static_cast<SemaphoreInterface*>(new FLDFSemaphore(type, maxCount, initialCount));
 		}
-
 	};
 }
 

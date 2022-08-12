@@ -13,6 +13,10 @@
 
 #define FLSYSTEM_3RD_STDIO
 
+#ifdef FLSYSTEM_ENABLE_LVGL_MEMORY_MANAGEMENT
+#define FLSYSTEM_3RD_LVGL
+#endif
+
 #include "../../3rdInclude.h"
 
 #include "FLFRQueue/FLFRQueue.h"
@@ -45,7 +49,7 @@ namespace FLSYSTEM
 			TaskHandle_t* createdThread = nullptr;
 			short coreID = 0;
 			BaseType_t returned = 0;
-			TickType_t runTimeDelay = 5;
+			TickType_t runTimeDelay = 50;
 			void* threadClass = nullptr;
 			void* userData = nullptr;
 		};
@@ -97,9 +101,17 @@ namespace FLSYSTEM
 			vTaskDelete(*(pConfig->createdThread));
 		}
 
-		void fl_threadDelay(unsigned long long time)
+		void fl_threadDelay(void* time)
 		{
-			vTaskDelay((TickType_t)time);
+			auto pConfig = static_cast<ThreadDelayConfig*>(time);
+
+			if (pConfig == nullptr)
+			{
+				this->exception("Error:Not the correct configuration file.");
+				return;
+			}
+
+			vTaskDelay((TickType_t)pConfig->time);
 		}
 
 		void fl_debug(const char* str, void* data = nullptr)
@@ -122,7 +134,6 @@ namespace FLSYSTEM
 		{
 			return static_cast<SemaphoreInterface*>(new FLFRSemaphore(type, (UBaseType_t)maxCount, (UBaseType_t)initialCount));
 		}
-
 	};
 }
 

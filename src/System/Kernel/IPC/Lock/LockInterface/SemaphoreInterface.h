@@ -15,7 +15,6 @@ namespace FLSYSTEM
 
 		virtual bool take(unsigned long long time = UINT64_MAX) = 0;
 		virtual void give() = 0;
-		virtual bool get() = 0;
 	};
 }
 

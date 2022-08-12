@@ -2,18 +2,19 @@
 #define FLSYSTEM_FLATOMICLOCK_H
 
 #include "../LockInterface/AtomicInterface.h"
-#include "../../../../../PlatformInterface/PlatformInterface.h"
+#include "../BaseLockInclude.h"
+#include "../../../API/GC_API/GC_API.h"
 
 namespace FLSYSTEM
 {
     template <typename T>
-	class FLAtomicLock
+	class FLAtomicLock : public GC_API
 	{
 	private:
 		AtomicInterface<T>* _atomicLock = nullptr;
 
 	public:
-		FLAtomicLock<T>(T data, FLLockType type = FLLockType::Atomic)
+		explicit FLAtomicLock<T>(T data = T(), FLLockType type = FLLockType::Atomic) : GC_API()
 		{
 			_atomicLock = FLSYSTEM_TRANSPLANTATION_INSTANCE->createAtomic<T>(type);
 		}

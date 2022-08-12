@@ -28,10 +28,10 @@ namespace FLSYSTEM
 	public:
 		virtual ~ThreadLockInterface<_TI>() {}
 
-		template <typename _Ty>
-		inline AtomicInterface<_Ty>* createAtomic(FLLockType type)
+		template <typename _Ty, typename ... _Args>
+		inline AtomicInterface<_Ty>* createAtomic(FLLockType type, _Args ... args)
 		{
-			return this->getTI()->template fl_createAtomic<_Ty>(type);
+			return this->getTI()->template fl_createAtomic<_Ty>(type, args...);
 		}
 
 		inline MutexInterface* createMutex(FLLockType type)

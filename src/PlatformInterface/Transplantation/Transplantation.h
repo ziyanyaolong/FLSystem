@@ -12,18 +12,24 @@ namespace FLSYSTEM
 		static TransplantationInterface<TI>* transplantationClass;
 
 	protected:
-		explicit Transplantation<TI>() {}
+		explicit Transplantation<TI>() { }
 
 	public:
 		virtual ~Transplantation<TI>() {}
 
-		inline static TransplantationInterface<TI>* instance()
+		FLInline FLStatic TransplantationInterface<TI>* instance()
 		{
 			if (transplantationClass == nullptr)
 				transplantationClass = static_cast<TransplantationInterface<TI>*>(TI::instance());
 
 			return transplantationClass;
 		};
+
+		FLInline FLStatic unsigned long long getSize()
+		{
+			std::cout << sizeof(*(Transplantation<TI>::transplantationClass))  << std::endl;
+			return sizeof(*(Transplantation<TI>::transplantationClass));
+		}
 	};
 }
 

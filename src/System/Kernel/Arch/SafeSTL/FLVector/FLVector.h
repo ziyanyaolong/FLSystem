@@ -16,7 +16,7 @@ namespace FLSYSTEM
 		FLSYSTEM_FLVECTOR_TYPE<T> list;
 
 	public:
-		FLVector() : STL_Basic() {}
+		FLVector(FLVector<T>::Mode mode = FLVector<T>::Mode::HaveLock) : STL_Basic(mode) {}
 		virtual ~FLVector() {}
 
 		T operator[] (const std::size_t& pos)

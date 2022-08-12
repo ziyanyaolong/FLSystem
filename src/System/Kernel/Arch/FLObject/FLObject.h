@@ -16,7 +16,6 @@ namespace FLSYSTEM
         FLObjectList *eventFilters = nullptr;
         FLObjectList *childrenList = nullptr;
         FLObject *_parent = nullptr;
-        bool isDelete = false;
 
     protected:
         bool isThread = false;
@@ -25,33 +24,34 @@ namespace FLSYSTEM
 
     public:
         FLObject(FLObject *parent = nullptr, const std::string &name = std::string(""));
-        FLObject(const std::string &name) : BaseAPI(name), FLRTTI(){}
+		FLObject(const std::string& name);
 		virtual ~FLObject();
 
-        inline FLObject *getParent() { return _parent; }
-        inline void setParent(FLObject *parent) { _parent = parent; }
-        
-        inline void installEventFilter(FLObject *object)
-        {
-            if (object->eventFilters == nullptr)
-                object->eventFilters = new FLObjectList();
+		void setParent(FLObject* parent);
 
-            object->eventFilters->push_back(this);
-        }
+        FLInline FLObject* getParent() { return _parent; }
 
-		inline bool isInstallEventFilter()
+		FLInline void installEventFilter(FLObject* object)
 		{
-            if (eventFilters == nullptr)
-            {
-                return false;
-            }
-            else
-            {
-				return true;
-            }
+			if (object->eventFilters == nullptr)
+			{
+				object->eventFilters = new FLObjectList(FLObjectList::Mode::NoLock);
+			}
+
+			object->eventFilters->push_back(this);
 		}
 
-        inline void deleteLater();
+		FLInline bool isInstallEventFilter()
+		{
+			if (eventFilters == nullptr)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
     };
 }
 

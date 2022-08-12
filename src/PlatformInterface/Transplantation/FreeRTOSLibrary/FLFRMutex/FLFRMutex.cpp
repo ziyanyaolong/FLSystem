@@ -40,8 +40,6 @@ inline bool FLSYSTEM::FLFRMutex::lock(unsigned long long xTicksToWait)
 		return false;
 		break;
 	}
-
-	_isLocking = true;
 }
 
 inline void FLSYSTEM::FLFRMutex::unlock()
@@ -59,20 +57,13 @@ inline void FLSYSTEM::FLFRMutex::unlock()
 	default:
 		break;
 	}
-
-	_isLocking = false;
-}
-
-inline bool FLSYSTEM::FLFRMutex::isLocking()
-{
-	return _isLocking;
 }
 
 FLSYSTEM::FLFRMutex::~FLFRMutex()
 {
 	if (_mutex)
 	{
-		unlock();
+		this->unlock();
 		vSemaphoreDelete(_mutex);
 	}
 }

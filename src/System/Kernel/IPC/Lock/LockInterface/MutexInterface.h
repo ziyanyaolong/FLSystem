@@ -15,7 +15,6 @@ namespace FLSYSTEM
 
 		virtual bool lock(unsigned long long  xTicksToWait = UINT64_MAX) = 0;
 		virtual void unlock() = 0;
-		virtual bool isLocking() = 0;
 	};
 }
 

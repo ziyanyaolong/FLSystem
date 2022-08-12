@@ -6,11 +6,11 @@
 
 #include "../../../../PlatformInterface/3rdInclude.h"
 #include "../../../../PlatformInterface/FLDefine.h"
-
+#include "../GC_API/GC_API.h"
 
 namespace FLSYSTEM
 {
-    class BaseAPI
+    class BaseAPI : public GC_API
     {
     private:
         static std::string placeholderStr;

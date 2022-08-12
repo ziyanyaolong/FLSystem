@@ -31,19 +31,25 @@ namespace FLSYSTEM
 
 		inline virtual _Ty load() noexcept
 		{
-			return _storedValue;
+			_aLock->lock();
+			auto tempData = _storedValue;
+			_aLock->unlock();
+			return tempData;
 		}
 
 		inline virtual bool compare_exchange_strong(_Ty& _Expected, const _Ty _Desired) noexcept
 		{
+			_aLock->lock();
 			if (_storedValue == _Expected)
 			{
 				_storedValue = _Desired;
+				_aLock->unlock();
 				return true;
 			}
 			else
 			{
 				_Expected = _storedValue;
+				_aLock->unlock();
 				return false;
 			}
 		}

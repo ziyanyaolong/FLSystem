@@ -28,7 +28,7 @@ FLSYSTEM::FLFRSemaphore::~FLFRSemaphore()
 {
 	if (_semaphore)
 	{
-		take();
+		this->take();
 		vSemaphoreDelete(_semaphore);
 	}
 }
@@ -66,11 +66,6 @@ inline void FLSYSTEM::FLFRSemaphore::give()
 	default:
 		break;
 	}
-}
-
-inline bool FLSYSTEM::FLFRSemaphore::get()
-{
-	return true;
 }
 
 inline bool FLSYSTEM::FLFRSemaphore::giveFromISR(BaseType_t* const pxHigherPriorityTaskWoken)

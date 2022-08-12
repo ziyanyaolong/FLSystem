@@ -1,21 +1,24 @@
 #ifndef FLSYSTEM_VIRTUALFILESYSTEMAPI_H
 #define FLSYSTEM_VIRTUALFILESYSTEMAPI_H
 
-#include "../Driver_API/Driver_API.h"
+#define FLSYSTEM_3RD_STRING
+#define FLSYSTEM_3RD_STDINT
+
+#include "../../../../PlatformInterface/3rdInclude.h"
+#include "../../../../PlatformInterface/FLDefine.h"
 
 namespace FLSYSTEM
 {
-    class VirtualFileSystemAPI : public Driver_API
+    class VirtualFileSystemAPI
     {
     public:
         friend class ExternalStorage;
 
     protected:
-        inline VirtualFileSystemAPI(const char *driver);
-        inline VirtualFileSystemAPI(const std::string &driver);
+        FLInline VirtualFileSystemAPI();
 
     public:
-        inline virtual ~VirtualFileSystemAPI();
+        FLInline virtual ~VirtualFileSystemAPI();
 
         virtual uint8_t open(const char *path, uint8_t mode = 0, void *data = nullptr) = 0;
         virtual uint8_t close(const char *path, uint8_t mode = 0, void *data = nullptr) = 0;

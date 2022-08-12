@@ -16,7 +16,7 @@ namespace FLSYSTEM
 		std::size_t max_size = 0;
 
 	public:
-		FLQueue(std::size_t number = 16) : STL_Basic()
+		FLQueue(std::size_t number = 16, FLQueue::Mode mode = FLQueue::Mode::HaveLock) : STL_Basic(mode)
 		{
 			max_size = number;
 		}
@@ -63,7 +63,7 @@ namespace FLSYSTEM
 			setRead();
 			auto tempData = queue.empty();
 			resetRead();
-			return tempData;
+			return tempData;                                
 		}
 
 		T peek()
@@ -71,6 +71,7 @@ namespace FLSYSTEM
 			setRead();
 			auto tempData = queue.front();
 			resetRead();
+			      
 			return tempData;
 		}
 

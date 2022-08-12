@@ -2,36 +2,44 @@
 #define FLSYSTEM_FLSYSTEM_MAIN_H
 
 #include "PlatformInterface/PlatformInterface.h"
-#include "Driver/ExternalStorage/ExternalStorage.h"
-#include "Driver/Display/Display.h"
 #include "System/Kernel/Kernel.h"
-#include "API_Library.h"
 
 namespace FLSYSTEM
 {
 	  
-	class FLSystem : public ProcessScheduleAPI
+	class FLSystem
 	{
 	private:
-		Kernel kernel;
 		bool isRun = false;
-		FLQueue<ProcessScheduleAPI*> processList;
-		FLVector<ProcessScheduleAPI*> mergeList;
+	//	FLQueue<ProcessScheduleAPI*> processList;
+	//	FLVector<ProcessScheduleAPI*> mergeList;
 
-	protected:
-		virtual void loop() override;
-		virtual void begin() override;
-		virtual bool event(FLEvent* event) override;
+	//protected:
 
 	public:
 		virtual ~FLSystem();
-		FLSystem();
+		explicit FLSystem();
 
 		void setTransplantation() {}
+		void init();
 		void start();
 		void registerProcess(ProcessScheduleAPI* api);
-		void merge(ProcessScheduleAPI* api);
+		void registerThread(ThreadAPI* api);
+
+		void* operator new(size_t size)
+		{
+			Kernel::boot();
+			return MemoryManagement::newData(size);
+		}
+
+		void operator delete(void* ptr)
+		{
+			MemoryManagement::deleteData(ptr);
+			Kernel::close();
+		}
 	};
+
+	extern FLSystem* FL_BIOS;
 }
 
-#endif
+#endif 

@@ -24,7 +24,6 @@ namespace FLSYSTEM
 
 		virtual bool take(unsigned long long xTicksToWait = portMAX_DELAY);
 		virtual void give() override;
-		virtual bool get() override;
 
 		bool giveFromISR(BaseType_t* const pxHigherPriorityTaskWoken = nullptr);
 		bool takeFromISR(BaseType_t* const pxHigherPriorityTaskWoken = nullptr);

@@ -20,13 +20,14 @@ namespace FLSYSTEM
         explicit EventCore();
         virtual ~EventCore();
 
-        virtual void process() override { process(static_cast<EventAPI*>(this)); }
         static void process(EventAPI* eventAPI);
 
         static bool notify(FLObject *object, FLEvent *event);
 
         static bool sendEvent(FLObject *receiver, FLEvent *event);
         static bool postEvent(FLObject *receiver, FLEvent *event);
+
+        FLInline virtual void process() override { EventCore::process(static_cast<EventAPI*>(this)); }
     };
 }
 

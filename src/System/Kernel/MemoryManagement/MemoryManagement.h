@@ -2,59 +2,63 @@
 #define FLSYSTEM_MEMORYMANAGEMENT_H
 
 #include "../../../PlatformInterface/PlatformInterface.h"
+#include "../API/KernelAPI/KernelAPI.h"
 
 namespace FLSYSTEM
 {
-	class MemoryManagement
+	class GC_API;
+	class MemoryManagement : public KernelAPI<MemoryManagement>
 	{
-	private:
-		unsigned long long StaticMemorySize = 0;
-		unsigned long long DynamicmemorySize = 0;
-
 	public:
-		explicit MemoryManagement() {}
-		virtual ~MemoryManagement() {}
-
-		template<typename T, typename ... Args>
-		static T* newDynamic(Args ... args)
+		explicit MemoryManagement()
 		{
-			auto* pTemp = new T(args...);
-			if (pTemp)
-			{
-				sizeof(T);
-				return pTemp;
-			}
-			else
-			{
-				FLExt
-				return nullptr;
-			}
+		}
+		virtual ~MemoryManagement()
+		{
 		}
 
-		template<typename T, typename ... Args>
-		static T* newStatic(Args ... args)
+		virtual void init() override 
 		{
-			return new T(args...);
+		}
+		virtual void run() override 
+		{
 		}
 
-		template<typename T>
-		static bool deleteDynamic(T* pointer)
+		virtual bool load() override
 		{
 			return true;
 		}
 
-		template<typename T>
-		static bool deleteStatic(T* pointer)
+		static void addGC(GC_API* api)
 		{
-			return true;
+			//MemoryManagement::instance()->gc_list.push_back(api);
 		}
 
-		template<typename T>
-		static bool deletAuto(T* pointer)
+		static void* newData(std::size_t size)
 		{
-			return true;
+			return FLSYSTEM_TRANSPLANTATION_INSTANCE->memory_malloc(size);
 		}
 
+		static void deleteData(void* ptr)
+		{
+			FLSYSTEM_TRANSPLANTATION_INSTANCE->memory_free(ptr);
+		}
+
+		static std::size_t getSize()
+		{
+			return FLSYSTEM_TRANSPLANTATION_INSTANCE->memory_getSize();
+		}
+
+		void* operator new(size_t size)
+		{
+			FLSYSTEM_TRANSPLANTATION_INSTANCE->memory_init();
+			return FLSYSTEM_TRANSPLANTATION_INSTANCE->memory_malloc(size);
+		}
+
+		void operator delete(void* ptr)
+		{
+			FLSYSTEM_TRANSPLANTATION_INSTANCE->memory_free(ptr);
+		}
 	};
 }
 

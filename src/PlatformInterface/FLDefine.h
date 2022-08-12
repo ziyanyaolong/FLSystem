@@ -3,5 +3,8 @@
 
 #define FLInterface struct
 #define FLInline inline
+#define FLStaticVirtual static
+#define FLStatic static
+#define FLConst const
 
 #endif

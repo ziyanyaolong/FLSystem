@@ -14,8 +14,7 @@ namespace FLSYSTEM
 
 		virtual bool lock_FLLock() = 0;
 		virtual void unlock_FLLock() = 0;
-		virtual bool isLocking_FLLock() = 0;
-		virtual FLLockType typeGet() = 0;
+		virtual FLLockType typeGet() const = 0;
 
 	public:
 		virtual ~FLLockInterface() {}

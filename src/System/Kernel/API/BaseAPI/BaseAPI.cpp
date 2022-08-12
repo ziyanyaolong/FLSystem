@@ -2,11 +2,11 @@
 
 std::string FLSYSTEM::BaseAPI::placeholderStr = "";
 
-FLSYSTEM::BaseAPI::BaseAPI()
+FLSYSTEM::BaseAPI::BaseAPI() : GC_API()
 {
 }
 
-FLSYSTEM::BaseAPI::BaseAPI(const std::string& name)
+FLSYSTEM::BaseAPI::BaseAPI(const std::string& name) : GC_API()
 {
 	if (!name.empty())
 	{
@@ -23,7 +23,7 @@ FLSYSTEM::BaseAPI::~BaseAPI()
 	}
 }
 
-FLInline bool FLSYSTEM::BaseAPI::isHaveName()
+bool FLSYSTEM::BaseAPI::isHaveName()
 {
 	if (m_name)
 	{
@@ -33,7 +33,7 @@ FLInline bool FLSYSTEM::BaseAPI::isHaveName()
 		return false;
 }
 
-FLInline void FLSYSTEM::BaseAPI::setName(const std::string& name)
+void FLSYSTEM::BaseAPI::setName(const std::string& name)
 {
 	if (name.empty())
 	{
@@ -47,7 +47,7 @@ FLInline void FLSYSTEM::BaseAPI::setName(const std::string& name)
 	*m_name = name;
 }
 
-FLInline void FLSYSTEM::BaseAPI::setName(const char* name)
+void FLSYSTEM::BaseAPI::setName(const char* name)
 {
 	if (strcmp(name, "") == 0)
 	{
@@ -60,7 +60,8 @@ FLInline void FLSYSTEM::BaseAPI::setName(const char* name)
 
 	*m_name = std::string(name);
 }
-FLInline const std::string& FLSYSTEM::BaseAPI::readName()
+
+const std::string& FLSYSTEM::BaseAPI::readName()
 {
 	if (!isHaveName())
 		return placeholderStr;

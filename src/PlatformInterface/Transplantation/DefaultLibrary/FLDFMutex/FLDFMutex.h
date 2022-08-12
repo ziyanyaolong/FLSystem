@@ -17,7 +17,6 @@ namespace FLSYSTEM
 	{
 	private:
 		void* _mutex = nullptr;
-		bool _isLooking = false;
 
 	public:
 		explicit FLDFMutex(FLLockType type = FLLockType::Mutex);
@@ -25,7 +24,6 @@ namespace FLSYSTEM
 
 		virtual bool lock(unsigned long long time = UINT64_MAX) override;
 		virtual void unlock() override;
-		virtual bool isLocking() override;
 		virtual void* getLock() override;
 	};
 }

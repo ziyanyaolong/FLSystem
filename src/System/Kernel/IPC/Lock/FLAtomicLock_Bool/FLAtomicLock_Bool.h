@@ -2,7 +2,6 @@
 #define FLSYSTEM_FLATOMICLOCK_BOOL_H
 
 #include "../FLAtomicLock/FLAtomicLock.h"
-#include "../LockInterface/FLLockInterface.h"
 
 namespace FLSYSTEM
 {
@@ -19,11 +18,6 @@ namespace FLSYSTEM
 			this->unlock();
 		}
 
-		inline virtual bool isLocking_FLLock() override
-		{
-			return this->get();
-		}
-
 	public:
 		FLAtomicLock_Bool() : FLAtomicLock<bool>(false), FLLockInterface() {}
 		virtual ~FLAtomicLock_Bool() {}
@@ -34,7 +28,7 @@ namespace FLSYSTEM
 			Direct
 		};
 
-		inline virtual FLLockType typeGet() override
+		inline virtual FLLockType typeGet() const override
 		{
 			return typeGet();
 		}

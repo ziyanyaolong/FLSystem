@@ -27,7 +27,6 @@ namespace FLSYSTEM
 		FLDFMutex* _mutex;
 		std::condition_variable_any cond;
 		long count = 0;
-		bool isLock = false;
 		
 		SemaphoreData* _semaphoreData = nullptr;
 
@@ -38,7 +37,6 @@ namespace FLSYSTEM
 
 		virtual void give() override;
 		virtual bool take(unsigned long long time = UINT64_MAX) override;
-		virtual bool get() override;
 	};
 }
 

@@ -19,13 +19,21 @@ namespace FLSYSTEM
 			uint64_t PID = 0;
 		};
 
+		bool isBegin();
+		bool isInit();
+
+		unsigned long long getPID();
+
+		virtual ~ProcessScheduleAPI();
+
 	protected:
-		ProcessScheduleAPI(FLObject* object = nullptr, const std::string& name = std::string("")) : ThreadAPI(object, name) {}
-		ProcessScheduleAPI(const std::string &name) : ThreadAPI(name) {}
+		ProcessScheduleAPI(FLObject* object = nullptr, const std::string& name = std::string(""));
 		ProcessConfig processConfig;
 
 		virtual void begin() = 0;
 		virtual void loop() {}
+
+		FLInline void runInEventLoop() override { loop(); }
 
 		virtual void run() override
 		{
@@ -35,19 +43,8 @@ namespace FLSYSTEM
 				begin();
 			}
 
-			while (!this->isExit())
-			{
-				loop();
-				process();
-				FLSYSTEM_TRANSPLANTATION_INSTANCE->threadDelay(threadConfig.runTimeDelay);
-			}
+			this->exec();
 		}
-
-	public:
-		bool isBegin() { return processConfig.isBegin; }
-		bool isInit() { return processConfig.isInit; }
-		unsigned long long getPID() const { return processConfig.PID; }
-		virtual ~ProcessScheduleAPI();
 	};
 }
 

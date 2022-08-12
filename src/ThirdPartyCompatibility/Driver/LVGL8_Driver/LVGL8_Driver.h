@@ -1,5 +1,5 @@
-#ifndef FLSYSTEM_LVGL_DRIVER_H
-#define FLSYSTEM_LVGL_DRIVER_H
+#ifndef FLSYSTEM_LVGL8_DRIVER_H
+#define FLSYSTEM_LVGL8_DRIVER_H
 
 #include "../../../PlatformInterface/PlatformInterface.h"
 
@@ -13,12 +13,12 @@
 
 namespace FLSYSTEM
 {
-	class LVGL_Driver : public DisplayAPI
+	class LVGL8_Driver : public DisplayAPI
 	{
 	public:
-		explicit LVGL_Driver(DisplayData* data = nullptr, FLObject* object = nullptr, const std::string& name = "") : DisplayAPI(data, object, name) {}
-		LVGL_Driver(uint16_t screenWidget, uint16_t screenHight, uint32_t rotated = 2, FLObject* object = nullptr, const std::string& name = "") : DisplayAPI(screenWidget, screenHight, rotated, object ,name) {}
-		virtual ~LVGL_Driver() {}
+		explicit LVGL8_Driver(DisplayData* data = nullptr, FLObject* object = nullptr, const std::string& name = "");
+		LVGL8_Driver(uint16_t screenWidget, uint16_t screenHight, uint32_t rotated = 2, FLObject* object = nullptr, const std::string& name = "");
+		virtual ~LVGL8_Driver();
 
 		enum class CacheMode
 		{
@@ -34,7 +34,7 @@ namespace FLSYSTEM
 			uint32_t screenTransp = 1;
 			uint32_t dpi = 10;
 			uint32_t cache = (screenWidget * screenHight) / 10;
-			FLSYSTEM::LVGL_Driver::CacheMode cacheMode = FLSYSTEM::LVGL_Driver::CacheMode::ONE_CACHE;
+			FLSYSTEM::LVGL8_Driver::CacheMode cacheMode = FLSYSTEM::LVGL8_Driver::CacheMode::ONE_CACHE;
 		};
 
 		struct LVGL_DisplayDriver
@@ -61,6 +61,8 @@ namespace FLSYSTEM
 	protected:
 		virtual DisplayData* createDisplayData() override { return static_cast<DisplayAPI::DisplayData*>(new LVGL_DisplayData()); }
 		virtual int regIn() override;
+		virtual void begin() override;
+		virtual void loop() override;
 
 	private:
 		LVGL_DisplayDriver lvgl_displayDriver;

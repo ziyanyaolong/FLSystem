@@ -2,12 +2,12 @@
 #define FLSYSTEM_FLMUTEX_H
 
 #include "../LockInterface/MutexInterface.h"
-#include "../LockInterface/FLLockInterface.h"
-#include "../../../../../PlatformInterface/PlatformInterface.h"
+#include "../BaseLockInclude.h"
+#include "../../../API/GC_API/GC_API.h"
 
 namespace FLSYSTEM
 {
-	class FLMutex : public FLLockInterface
+	class FLMutex : public FLLockInterface, public GC_API
 	{
 	private:
 		MutexInterface* _mutex = nullptr;
@@ -22,31 +22,55 @@ namespace FLSYSTEM
 			this->unlock();
 		}
 
-		inline virtual bool isLocking_FLLock() override
-		{
-			return this->isLocking();
-		}
-
-	public:
-		explicit FLMutex(FLLockType type = FLLockType::Mutex) : FLLockInterface()
+		void createMutex(FLLockType type)
 		{
 			_mutex = FLSYSTEM_TRANSPLANTATION_INSTANCE->createMutex(type);
 		}
 
-		virtual ~FLMutex() 
+		FLMutex& deepCopy(const FLMutex& flMutex)
 		{
-			delete _mutex;
-			_mutex = nullptr;
+			if (this->_mutex)
+			{
+				_mutex->unlock();
+
+				delete _mutex;
+
+				if (flMutex._mutex)
+				{
+					this->createMutex(flMutex.typeGet());
+				}
+			}
+
+			return *this;
 		}
 
-		inline virtual FLLockType typeGet() override
+	public:
+		explicit FLMutex() : FLLockInterface(), GC_API()
+		{
+		}
+
+		explicit FLMutex(FLLockType type) : FLLockInterface(), GC_API()
+		{
+			this->createMutex(type);
+		}
+
+		virtual ~FLMutex()
+		{
+			if (_mutex)
+			{
+				_mutex->unlock();
+				delete _mutex;
+				_mutex = nullptr;
+			}
+		}
+
+		inline virtual FLLockType typeGet() const override
 		{
 			return _mutex->typeGet();
 		}
 
 		inline bool lock(unsigned long long  xTicksToWait = UINT64_MAX) { return _mutex->lock(xTicksToWait); }
 		inline void unlock() { _mutex->unlock(); }
-		inline bool isLocking() { return _mutex->isLocking(); }
 
 		inline bool isMutex()
 		{
@@ -68,6 +92,20 @@ namespace FLSYSTEM
 				return false;
 		}
 
+		FLMutex(const FLMutex& flMutex)
+		{
+			this->deepCopy(flMutex);
+		}
+
+		FLMutex(const FLMutex&& flMutex)
+		{
+			this->deepCopy(flMutex);
+		}
+
+		FLMutex& operator=(const FLMutex& flMutex)
+		{
+			return this->deepCopy(flMutex);
+		}
 	};
 }
 

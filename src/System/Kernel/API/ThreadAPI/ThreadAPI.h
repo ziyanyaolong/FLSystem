@@ -3,17 +3,42 @@
 
 #include "../EventAPI/EventAPI.h"
 #include "../../IPC/IPC.h"
-#include "../../IPC/Lock/FLLock/FLLock.h"
+#include "../../IPC/Lock/FLReadWriteLock/FLReadWriteLock.h"
 
 namespace FLSYSTEM
 {
 	class ThreadAPI : public EventAPI
 	{
-	public:
-		friend class ProcessSchedule;
-		friend class ProcessPool;
-		friend class FLThread;
+	private:
+		struct ThreadData
+		{
+			bool isStart = false;
+			bool isEnd = false;
+			bool isExit = false;
+			unsigned long long shallowSleepTime = 0;
+		};
 
+		FLSYSTEM_TRANSPLANTATION_TYPE::ThreadConfig _threadConfig_;
+
+		ThreadData _threadData_;
+		FLReadWriteLock _lock;
+
+	protected:
+		virtual void run() = 0;
+
+		virtual void runInEventLoop() {}
+		virtual void exitOut();
+		virtual void process() override;
+
+		void exec();
+		void sleep(int64_t time);
+		static bool sleep(ThreadAPI* threadPointer,int64_t time);
+		void shallowSleep(int64_t time);
+
+		FLInline FLReadWriteLock& getLock() { return _lock; }
+		FLInline FLSYSTEM_TRANSPLANTATION_TYPE::ThreadConfig* getConfig() { return &_threadConfig_; }
+		
+	public:
 		enum class ThreadState
 		{
 			Delete,
@@ -22,39 +47,19 @@ namespace FLSYSTEM
 			Ready
 		};
 
-	private:
-		FLLock _finishProcess;
+		friend class ProcessSchedule;
 
-	protected:
-		FLSYSTEM_TRANSPLANTATION_TYPE::ThreadConfig threadConfig;
-		virtual void run() = 0;
-		inline virtual void exitOut() { _finishProcess.unlock(); }
-		inline virtual void process() override
-		{
-			EventCore::process(static_cast<EventAPI*>(this));
-		}
-
-	public:
-		ThreadAPI(const std::string& name) : EventAPI(name) { isThread = true; }
-		explicit ThreadAPI(FLObject* object = nullptr, const std::string& name = std::string("")) : ThreadAPI(name) {}
+		explicit ThreadAPI(FLObject* parent = nullptr, const std::string& name = std::string(""));
 		virtual ~ThreadAPI() {}
 
-		inline virtual int exit() { _finishProcess.lock(); return 0; }
-		inline virtual void start() { run(); }
+		int exit();
+		void start();
+		bool isExit();
+		bool isStart();
 
-		inline bool isExit() { return _finishProcess.isLocking(); }
-
-		inline void exec()
-		{
-			while (!_finishProcess.isLocking())
-			{
-				process();
-				FLSYSTEM_TRANSPLANTATION_INSTANCE->threadDelay(threadConfig.runTimeDelay);
-			}
-		}
-
-		FLSYSTEM_TRANSPLANTATION_TYPE::ThreadConfig& getThreadConfig() { return threadConfig; }
-		FLSYSTEM_TRANSPLANTATION_TYPE::ThreadConfig* getThreadConfigPointer() { return &threadConfig; }
+		void setRunTimeDelay(unsigned long long time);
+		void setPriority(unsigned long priority);
+		void setStackDepth(unsigned long stackDepth);
 	};
 }
 

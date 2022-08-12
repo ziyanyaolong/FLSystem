@@ -3,8 +3,7 @@
 
 #include "../../../../../PlatformInterface/PlatformInterface.h"
 #include "../../Lock/FLLock/FLLock.h"
-
-#define FLRegisterEvent(name) namespace FLSYSTEM { namespace FLEventTypes { const FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType name = FLSYSTEM::FLEvent::registerEventType(); } }
+#include "../../../API/GC_API/GC_API.h"
 
 namespace FLSYSTEM
 {
@@ -12,25 +11,26 @@ namespace FLSYSTEM
 	{
 	}
 
-	class FLEvent
+	class FLEvent : public GC_API
 	{
 	public:
 		enum Type : FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType
 		{
 			Normal = 0,
 			ExitLoop,
-			EndEvent,
 			RegiserEvent,
+			EndEvent,
 		};
 
     private:
 		FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType _type = static_cast<FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType>(FLEvent::Type::Normal);
 		static FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType _userType;
 		void* userData_ = nullptr;
-		bool _isCondense;
+		bool _isCondense = false;
 
     public:
         FLEvent();
+
 		FLEvent(FLEvent::Type type, bool isCondense = false) : FLEvent()
 		{
 			_type = static_cast<FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType>(type);
@@ -44,8 +44,6 @@ namespace FLSYSTEM
 		}
 
         virtual ~FLEvent();
-
-		inline const FLEvent::Type type() { return static_cast<FLEvent::Type>(_type); }
 
 		static FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType registerEventType(FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType replacementValue = 0)
 		{
@@ -73,6 +71,11 @@ namespace FLSYSTEM
 			}
 		}
 
+		inline const FLEvent::Type type() 
+		{
+			return static_cast<FLEvent::Type>(_type); 
+		}
+
 		inline void setUserData(void* userData)
 		{
 			userData_ = userData;
@@ -89,5 +92,7 @@ namespace FLSYSTEM
 		}
 	};
 }
+
+#define FLRegisterEvent(name) namespace FLSYSTEM { namespace FLEventTypes { const FLSYSTEM_TRANSPLANTATION_TYPE::FLEventSizeType name = FLSYSTEM::FLEvent::registerEventType(); } }
 
 #endif

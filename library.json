@@ -1,6 +1,6 @@
 {
     "name": "FLSystem",
-    "version": "0.0.1",
+    "version": "0.2.2",
     "keywords": "Arduino, RP2040, STM32, ESP8266, NodeMCU, ESP32",
     "description": "It is an operating system library that provides APIS, auto-configuration applications, auto-management functions, and is compatible with LVGL, FreeRTOS, U8g2, TFT_eSPI and other libraries.",
     "repository": {

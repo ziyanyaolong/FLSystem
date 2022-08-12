@@ -28,17 +28,17 @@ bool FLSYSTEM::Display::registerDisplay(DisplayAPI* api)
 void FLSYSTEM::Display::loop()
 {
 	auto tableSize = displayList.getTable().size();
-	displayList.getTable().lock();
+
 	for (std::size_t i = 0; i < tableSize; i++)
 	{
 		if (displayList.getTable()[i]->isBegin())
 		{
-			displayList.getTable().begin();
+			displayList.getTable()[i]->begin();
 		}
 
 		displayList.getTable()[i]->loop();
 	}
-	displayList.getTable().unlock();
+
 	/*for (auto &&i : registerMapTable)
 	{
 	  auto display = i.second;

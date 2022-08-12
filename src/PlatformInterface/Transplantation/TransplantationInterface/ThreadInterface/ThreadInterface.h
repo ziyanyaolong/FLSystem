@@ -20,7 +20,7 @@ namespace FLSYSTEM
 	public:
 		virtual ~ThreadInterface<_TI>() {}
 
-		inline void threadDelay(unsigned long long time)
+		inline void threadDelay(void* time)
 		{
 			this->getTI()->fl_threadDelay(time);
 		}

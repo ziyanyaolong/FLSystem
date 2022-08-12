@@ -2,23 +2,25 @@
 #define FLSYSTEM_IPC_H
 
 #include "../../../FLSystemConfig.h"
-#include "../Arch/Object/FLObject.h"
+#include "../API/KernelAPI/KernelAPI.h"
 #include "../Arch/SafeSTL/FLQueue/FLQueue.h"
 #include "Event/EventCore/EventCore.h"
 #include "Event/FLEvent/FLEvent.h"
+#include "../API/GC_API/GC_API.h"
 
 namespace FLSYSTEM
 {
-    class IPC : public FLObject
+    class IPC : public KernelAPI<IPC>, public GC_API
     {
     private:
 
     public:
-        IPC();
+        explicit IPC();
         virtual ~IPC();
-        static EventCore eventCore;
-        void begin() {}
-        void run() { eventCore.process(); }
+        static EventCore* eventCore;
+        virtual void init() override;
+        virtual void run() override;
+        virtual bool load() override;
     };
 }
 

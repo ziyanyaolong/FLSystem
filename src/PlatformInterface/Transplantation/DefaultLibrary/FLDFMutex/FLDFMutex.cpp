@@ -36,8 +36,6 @@ inline bool FLSYSTEM::FLDFMutex::lock(unsigned long long  time)
 				return false;
 			}
 		}
-		_isLooking = true;
-		return true;
 		break;
 	case FLSYSTEM::FLLockType::Mutex:
 		if (time == UINT64_MAX)
@@ -51,8 +49,6 @@ inline bool FLSYSTEM::FLDFMutex::lock(unsigned long long  time)
 				return false;
 			}
 		}
-		_isLooking = true;
-		return true;
 		break;
 	case FLSYSTEM::FLLockType::RecursiveMutex:
 		if (time == UINT64_MAX)
@@ -66,14 +62,14 @@ inline bool FLSYSTEM::FLDFMutex::lock(unsigned long long  time)
 				return false;
 			}
 		}
-		_isLooking = true;
-		return true;
 		break;
 	default:
+		return false;
 		break;
 	}
 
-	return false;
+	return true;
+
 }
 
 inline void FLSYSTEM::FLDFMutex::unlock()
@@ -92,13 +88,6 @@ inline void FLSYSTEM::FLDFMutex::unlock()
 	default:
 		break;
 	}
-
-	_isLooking = false;
-}
-
-inline bool FLSYSTEM::FLDFMutex::isLocking()
-{
-	return _isLooking;
 }
 
 inline void* FLSYSTEM::FLDFMutex::getLock()

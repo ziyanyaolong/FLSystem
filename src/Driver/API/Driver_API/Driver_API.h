@@ -12,7 +12,6 @@ namespace FLSYSTEM
         
     protected:
         Driver_API(FLObject *object = nullptr, const std::string &name = std::string("")) : ProcessScheduleAPI(object, name) {}
-        Driver_API(const std::string &name) : ProcessScheduleAPI(name) {}
         virtual int regIn() { return 0; }
 
     public:

@@ -1,91 +1,98 @@
 #ifndef FLSYSTEM_STL_BASIC_H
 #define FLSYSTEM_STL_BASIC_H
 
-#include "../../../IPC/Lock/FLLock/FLLock.h"
+#include "../../../IPC/Lock/FLReadWriteLock/FLReadWriteLock.h"
+#include "../../../API/GC_API/GC_API.h"
 
 namespace FLSYSTEM
 {
-	class STL_Basic
+	class STL_Basic : public GC_API
 	{
+	public:
+		enum class Mode
+		{
+			NoLock,
+			HaveLock
+		};
+
 	private:
-		FLLock writeLook;
-		FLLock readLook;
+		FLReadWriteLock* look = nullptr;
+		Mode _mode_;
 
 	protected:
-		void setWrite()
+		FLInline void setWrite()
 		{
-			while (true)
+			if (look)
 			{
-				if (writeLook.isLocking() || readLook.isLocking())
-				{
-					continue;
-				}
-
-				writeLook.lock();
-
-				if (!writeLook.isLocking() || readLook.isLocking())
-				{
-					writeLook.unlock();
-					continue;
-				}
-
-				break;
+				look->lockWrite();
 			}
 		}
 
-		void resetWrite()
+		FLInline void resetWrite()
 		{
-			writeLook.unlock();
-		}
-
-		void setRead()
-		{
-			while (true)
+			if (look)
 			{
-				if (writeLook.isLocking())
-				{
-					continue;
-				}
-				else if (readLook.isLocking())
-				{
-					break;
-				}
-
-				readLook.lock();
-
-				if (!readLook.isLocking() || writeLook.isLocking())
-				{
-					readLook.unlock();
-					continue;
-				}
-				break;
+				look->unlockWrite();
 			}
 		}
 
-		void resetRead()
+		FLInline void setRead()
 		{
-			readLook.unlock();
+			if (look)
+			{
+				look->lockRead();
+			}
 		}
 
-		void setAlgorithm()
+		FLInline void resetRead()
+		{
+			if (look)
+			{
+				look->unlockRead();
+			}
+		}
+
+		FLInline void setAlgorithm()
 		{
 			setWrite();
 		}
 
-		void resetAlgorithm()
+		FLInline void resetAlgorithm()
 		{
 			resetWrite();
 		}
 
 	public:
-		void lock()
+		FLInline void lock()
 		{
 			setAlgorithm();
 		}
 
-		void unlock()
+		FLInline void unlock()
 		{
 			resetAlgorithm();
+		}
+
+		STL_Basic(Mode mode = Mode::HaveLock)
+			: GC_API(), _mode_(mode)
+		{
+			switch (mode)
+			{
+			case FLSYSTEM::STL_Basic::Mode::NoLock:
+				break;
+			case FLSYSTEM::STL_Basic::Mode::HaveLock:
+				look = new FLReadWriteLock();
+				break;
+			default:
+				break;
+			}
+		}
+		virtual ~STL_Basic() 
+		{
+			if (look)
+			{
+				look->deleteLater();
+			}
 		}
 	};
 }

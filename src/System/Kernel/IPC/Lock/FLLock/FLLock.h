@@ -1,18 +1,20 @@
 #ifndef FLSYSTEM_FLLOCK_H
 #define FLSYSTEM_FLLOCK_H
 
-#include "../../../../../PlatformInterface/FLDefine.h"
+#include "../BaseLockInclude.h"
 #include "../FLMutex/FLMutex.h"
 #include "../FLAtomicLock_Bool/FLAtomicLock_Bool.h"
 #include "../FLSemaphore/FLSemaphore.h"
+#include "../../../API/GC_API/GC_API.h"
 
 namespace FLSYSTEM
 {
-	class FLLock
+	class FLLock : public GC_API
 	{
 	private:
 		FLLockInterface* _lock = nullptr;
 		bool createLock(FLLockType type);
+		bool _isLocked = false;
 
 	public:
 		explicit FLLock(FLLockType type = FLLockType::Atomic);
@@ -20,7 +22,6 @@ namespace FLSYSTEM
 
 		bool lock(unsigned long long time = UINT64_MAX);
 		void unlock();
-		bool isLocking();
 
 		inline FLLockType typeGet()
 		{

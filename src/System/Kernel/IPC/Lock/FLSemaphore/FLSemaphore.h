@@ -2,12 +2,12 @@
 #define FLSYSTEM_FLSEMAPHORE_H
 
 #include "../LockInterface/SemaphoreInterface.h"
-#include "../LockInterface/FLLockInterface.h"
-#include "../../../../../PlatformInterface/PlatformInterface.h"
+#include "../BaseLockInclude.h"
+#include "../../../API/GC_API/GC_API.h"
 
 namespace FLSYSTEM
 {
-	class FLSemaphore : public FLLockInterface
+	class FLSemaphore : public FLLockInterface, public GC_API
 	{
 	private:
 		SemaphoreInterface* _semaphore = nullptr;
@@ -22,13 +22,8 @@ namespace FLSYSTEM
 			this->give();
 		}
 
-		virtual bool isLocking_FLLock() override
-		{
-			return this->get();
-		}
-
 	public:
-		explicit FLSemaphore(FLLockType type = FLLockType::Binary, unsigned long long maxCount = 1, unsigned long long initialCount = 0) : FLLockInterface()
+		explicit FLSemaphore(FLLockType type = FLLockType::Binary, unsigned long long maxCount = 1, unsigned long long initialCount = 0) : FLLockInterface(), GC_API()
 		{
 			_semaphore = FLSYSTEM_TRANSPLANTATION_INSTANCE->createSemaphore(type, maxCount, initialCount);
 		}
@@ -39,7 +34,7 @@ namespace FLSYSTEM
 			_semaphore = nullptr;
 		}
 
-		inline virtual FLLockType typeGet() override
+		inline virtual FLLockType typeGet() const override
 		{
 			return _semaphore->typeGet();
 		}
@@ -52,11 +47,6 @@ namespace FLSYSTEM
 		inline void give()
 		{
 			_semaphore->give();
-		}
-
-		inline bool get()
-		{
-			return _semaphore->get();
 		}
 
 		inline bool isBinary()

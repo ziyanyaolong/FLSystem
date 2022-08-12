@@ -2,6 +2,14 @@
 #include <stdint.h>
 #endif
 
+#ifdef FLSYSTEM_3RD_MALLOC
+#include <malloc.h>
+#endif
+
+#ifdef FLSYSTEM_3RD_TLSF
+#include <tlsf.h>
+#endif
+
 #ifdef FLSYSTEM_3RD_CSTDDEF
 #include <cstddef>
 #endif
@@ -23,7 +31,8 @@
 #endif
 
 #ifdef FLSYSTEM_3RD_LVGL
-#include "lvgl.h"
+#include <lvgl.h>
+#include <misc/lv_tlsf.h>
 #endif
 
 
@@ -75,6 +84,13 @@
 
 #ifdef FLSYSTEM_3RD_FREERTOS_NORMAL
 #include <FreeRTOS.h>
+#endif
+
+#ifdef FLSYSTEM_3RD_FREERTOS_ESPRESSIF
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+#include <freertos/task.h>
+#include <freertos/queue.h>
 #endif
 
 #ifdef FLSYSTEM_3RD_FREERTOS_ARDUINO

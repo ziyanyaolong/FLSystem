@@ -1,5 +1,10 @@
 #include "FLSystem.h"
 
+namespace FLSYSTEM
+{
+	FLSystem* FL_BIOS = new FLSystem();
+}
+
 #ifdef FLSYSTEM_ENABLE_LVGL_8
 // void FLSystem::readEvent(lv_event_t *e)
 // {
@@ -11,64 +16,68 @@
 // }
 #endif
 
-FLSYSTEM::FLSystem::FLSystem() : ProcessScheduleAPI()
+FLSYSTEM::FLSystem::FLSystem()
 {
-	threadConfig.runTimeDelay = 5;
-	threadConfig.stackDepth = 4096;
+	//Kernel::boot();
+	//this->setRunTimeDelay(5);
+	//this->setStackDepth(4096);
 }
 
 FLSYSTEM::FLSystem::~FLSystem()
 {
-	mergeList.clear();
+	//Kernel::close();
+	//mergeList.clear();
 }
 
-void FLSYSTEM::FLSystem::merge(FLSYSTEM::ProcessScheduleAPI* api)
-{
-	mergeList.push_back(api);
-}
-
-bool FLSYSTEM::FLSystem::event(FLEvent* event)
-{
-	if (event->type() == FLEvent::Type::RegiserEvent)
-	{
-		auto process = static_cast<ProcessScheduleAPI*>(event->getUserData());
-		if (process == nullptr)
-		{
-			return false;
-		}
-		kernel.processSchedule.createProcess(process);
-		return true;
-	}
-	return false;
-}
+//bool FLSYSTEM::FLSystem::event(FLEvent* event)
+//{
+//	if (event->type() == FLEvent::Type::RegiserEvent)
+//	{
+//		auto process = static_cast<ProcessScheduleAPI*>(event->getUserData());
+//		if (process == nullptr)
+//		{
+//			return false;
+//		}
+//		kernel.processSchedule.createProcess(process);
+//		return true;
+//	}
+//	return false;
+//}
 
 void FLSYSTEM::FLSystem::registerProcess(ProcessScheduleAPI* api)
 {
-	FLEvent* event = new FLEvent(FLEvent::RegiserEvent);
-	event->setUserData(static_cast<void*>(api));
-	FLEventCore.postEvent(this, event);
+	Kernel::instance()->sysCall(Kernel::SysCallNumber::ProcessCreateRequest, api);
 }
 
-void FLSYSTEM::FLSystem::begin()
+void FLSYSTEM::FLSystem::registerThread(ThreadAPI* api)
 {
-	kernel.init();
-	mergeList.lock();
-	for (auto&& i = mergeList.begin(); i != mergeList.end(); i++)
-	{
-		(*i)->begin();
-	}
-	mergeList.unlock();
+	Kernel::instance()->sysCall(Kernel::SysCallNumber::ThreadCreateRequest, api);
 }
+//void FLSYSTEM::FLSystem::begin()
+//{
+//	kernel.loadKernel();
+//	kernel.init();
+//	mergeList.lock();
+//	for (auto&& i = mergeList.begin(); i != mergeList.end(); i++)
+//	{
+//		(*i)->begin();
+//	}
+//	mergeList.unlock();
+//}
+//
+//void FLSYSTEM::FLSystem::loop()
+//{
+//	kernel.run();
+//	mergeList.lock();
+//	for (auto&& i = mergeList.begin(); i != mergeList.end(); i++)
+//	{
+//		(*i)->loop();
+//	}
+//	mergeList.unlock();
+//}
 
-void FLSYSTEM::FLSystem::loop()
+void FLSYSTEM::FLSystem::init()
 {
-	kernel.run();
-	mergeList.lock();
-	for (auto&& i = mergeList.begin(); i != mergeList.end(); i++)
-	{
-		(*i)->loop();
-	}
-	mergeList.unlock();
 }
 
 void FLSYSTEM::FLSystem::start()
@@ -76,7 +85,7 @@ void FLSYSTEM::FLSystem::start()
 	if (!isRun)
 	{
 		isRun = true;
-		kernel.processSchedule.createThread(this);
+		Kernel::instance()->start();
 	}
 
 #ifdef FLSYSTEM_TASK_START_SCHEDULER
@@ -84,9 +93,13 @@ void FLSYSTEM::FLSystem::start()
 #endif
 
 #if ((!defined(FLSYSTEM_ENABLE_MAIN_THREAD)) && (!(defined(FLSYSTEM_TASK_START_SCHEDULER))))
+	FLSYSTEM_TRANSPLANTATION_TYPE::ThreadDelayConfig config;
+	config.threadConfig = nullptr;
+	//config.time = FLSYSTEM_TRANSPLANTATION_TYPE::DefaultConfig::maxDelay;
+	config.time = 5;
 	while (true)
 	{
-		FLSYSTEM_TRANSPLANTATION_INSTANCE->threadDelay(UINT64_MAX);
+		FLSYSTEM_TRANSPLANTATION_INSTANCE->threadDelay(&config);
 	}
 #endif
 }

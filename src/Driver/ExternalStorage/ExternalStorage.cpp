@@ -1,10 +1,6 @@
 #include "ExternalStorage.h"
 
-FLSYSTEM::ExternalStorage::ExternalStorage(const std::string& name) : Driver_API(name)
-{
-}
-
-FLSYSTEM::ExternalStorage::ExternalStorage(const char* name) : Driver_API(name)
+FLSYSTEM::ExternalStorage::ExternalStorage(FLObject* parent, const std::string& name) : Driver_API(parent, name)
 {
 }
 

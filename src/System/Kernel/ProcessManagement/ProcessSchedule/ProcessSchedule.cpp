@@ -1,17 +1,40 @@
 #include "ProcessSchedule.h"
 
-FLSYSTEM::ProcessPool FLSYSTEM::ProcessSchedule::processPool;
-
-FLSYSTEM::ProcessSchedule::ProcessSchedule()
+FLSYSTEM::ProcessSchedule::ProcessSchedule() : KernelAPI(), GC_API()
 {
 }
 
 FLSYSTEM::ProcessSchedule::~ProcessSchedule()
 {
+	if (createThreadLock)
+	{
+		delete createThreadLock;
+		createThreadLock = nullptr;
+	}
+
+	if (processPool)
+	{
+		delete processPool;
+		processPool = nullptr;
+	}
 }
 
-void FLSYSTEM::ProcessSchedule::begin()
+void FLSYSTEM::ProcessSchedule::init()
 {
+}
+
+bool FLSYSTEM::ProcessSchedule::load()
+{
+	if (createThreadLock == nullptr)
+	{
+		createThreadLock = new FLLock();
+	}
+
+	if (processPool == nullptr)
+	{
+		processPool = new ProcessPool();
+	}
+	return true;
 }
 
 int FLSYSTEM::ProcessSchedule::createThread(ThreadAPI* thread)
@@ -21,17 +44,24 @@ int FLSYSTEM::ProcessSchedule::createThread(ThreadAPI* thread)
 		FLSYSTEM_TRANSPLANTATION_INSTANCE->exception("ERROR In CreateThread:fun pointer or config pointer is empty!");
 		return -1;
 	}
-	createThreadLock.lock();
+	createThreadLock->lock();
 
-	thread->getThreadConfig().threadCode = &FLSYSTEM::ProcessSchedule::_runMiddle_T;
-	thread->getThreadConfig().threadClass = (void*)thread;
-	thread->threadConfig.returned = FLSYSTEM_TRANSPLANTATION_INSTANCE->createThread(static_cast<void*>(thread->getThreadConfigPointer()));
+	thread->_lock.lockWrite();
+	thread->_threadConfig_.threadCode = &FLSYSTEM::ProcessSchedule::_runMiddle_T;
+	thread->_threadConfig_.threadClass = (void*)thread;
+	thread->_lock.unlockWrite();
 
-	processPool.addThread(thread);
+	auto tempReturned = FLSYSTEM_TRANSPLANTATION_INSTANCE->createThread(static_cast<void*>(&(thread->_threadConfig_)));
 
-	createThreadLock.unlock();
+	thread->_lock.lockWrite();
+	thread->_threadConfig_.returned = tempReturned;
+	thread->_lock.unlockWrite();
 
-	return thread->threadConfig.returned;
+	processPool->addThread(thread);
+
+	createThreadLock->unlock();
+
+	return tempReturned;
 }
 
 int FLSYSTEM::ProcessSchedule::createProcess(ProcessScheduleAPI* process)
@@ -42,17 +72,35 @@ int FLSYSTEM::ProcessSchedule::createProcess(ProcessScheduleAPI* process)
 		return -1;
 	}
 
-	createThreadLock.lock();
+	createThreadLock->lock();
 
-	process->getThreadConfig().threadCode = &FLSYSTEM::ProcessSchedule::_runMiddle_P;
-	process->getThreadConfig().threadClass = (void*)process;
-	process->threadConfig.returned = FLSYSTEM_TRANSPLANTATION_INSTANCE->createThread(process->getThreadConfigPointer());
+	process->_lock.lockWrite();
 
-	processPool.addProcess(process);
+	process->_threadConfig_.threadCode = &FLSYSTEM::ProcessSchedule::_runMiddle_P;
+	process->_threadConfig_.threadClass = (void*)process;
+	process->_lock.unlockWrite();
 
-	createThreadLock.unlock();
+	auto tempReturn = FLSYSTEM_TRANSPLANTATION_INSTANCE->createThread(&(process->_threadConfig_));
 
-	return process->threadConfig.returned;
+	process->_lock.lockWrite();
+	process->_threadConfig_.returned = tempReturn;
+	process->_lock.unlockWrite();
+
+	processPool->addProcess(process);
+
+	createThreadLock->unlock();
+
+	return tempReturn;
+}
+
+void FLSYSTEM::ProcessSchedule::deleteProcess(ProcessScheduleAPI* process)
+{
+	process->deleteLater();
+}
+
+void FLSYSTEM::ProcessSchedule::deleteThread(ThreadAPI* thread)
+{
+	thread->deleteLater();
 }
 
 void FLSYSTEM::ProcessSchedule::_runMiddle_P(void* threadConfig)
@@ -75,8 +123,11 @@ void FLSYSTEM::ProcessSchedule::_runMiddle_P(void* threadConfig)
 	processPointer->run();
 	processPointer->exit();
 	processPointer->exitOut();
-	FLSYSTEM::ProcessSchedule::processPool.deleteProcess(processPointer);
+	FLSYSTEM::ProcessSchedule::instance()->processPool->deleteProcess(processPointer);
 	FLSYSTEM_TRANSPLANTATION_INSTANCE->exitThread(threadConfigPoiner);
+	processPointer->deleteLater();
+
+
 }
 void FLSYSTEM::ProcessSchedule::_runMiddle_T(void* threadConfig)
 {
@@ -98,8 +149,9 @@ void FLSYSTEM::ProcessSchedule::_runMiddle_T(void* threadConfig)
 	threadPointer->run();
 	threadPointer->exit();
 	threadPointer->exitOut();
-	FLSYSTEM::ProcessSchedule::processPool.deleteThread(threadPointer);
+	FLSYSTEM::ProcessSchedule::instance()->processPool->deleteThread(threadPointer);
 	FLSYSTEM_TRANSPLANTATION_INSTANCE->exitThread(threadConfigPoiner);
+	threadPointer->deleteLater();
 }
 
 void FLSYSTEM::ProcessSchedule::run()

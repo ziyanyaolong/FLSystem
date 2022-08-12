@@ -20,8 +20,12 @@ namespace FLSYSTEM
 		std::atomic<_Ty> _atomic;
 
 	public:
-		explicit FLDFAtomic<_Ty>(FLLockType type) : AtomicInterface<_Ty>(type){}
+		FLDFAtomic<_Ty>(FLDFAtomic<_Ty>& a) { _atomic.store(a.load()); }
+		FLDFAtomic<_Ty>(FLDFAtomic<_Ty>&& a) { _atomic.store(a.load()); }
+		explicit FLDFAtomic<_Ty>(FLLockType type = FLLockType::Atomic) : AtomicInterface<_Ty>(type) {}
 		virtual ~FLDFAtomic<_Ty>() {}
+
+		void operator=(const FLDFAtomic& a) { this->store(a.load()); }
 
 		inline virtual  _Ty load() noexcept override { return _atomic.load(); }
 		inline virtual bool compare_exchange_strong(_Ty& _Expected, const _Ty _Desired) noexcept override { return _atomic.compare_exchange_strong(_Expected, _Desired); }
